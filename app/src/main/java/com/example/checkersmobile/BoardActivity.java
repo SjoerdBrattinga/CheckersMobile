@@ -30,7 +30,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void drawBoard(){
-        int size = 8;
+        int size = game.getBoardSize();
         btnBoard = new ImageButton[size][size];
 
         for (int i = 0; i < size; i++) {
@@ -49,12 +49,17 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void updateBoard(){
+//        ArrayList<Position> positions = game.getAllPiecePositions();
+//        for (int i = 0; i < positions.size(); i++) {
+//            drawPiece(positions.get(i));
+//        }
+//            Piece piece = game.getPiece(positions.get(i));
+//            if(piece != null){
+//                drawPiece(piece);
+//            }
         for (int i = 0; i < game.getBoardSize(); i++) {
             for (int j = 0; j < game.getBoardSize(); j++) {
-                Piece piece = game.getPiece(i,j);
-                if(piece != null){
-                    drawPiece(piece);
-                }
+                drawPiece(new Position(i,j));
             }
         }
     }
@@ -72,13 +77,14 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void drawPiece(Position position){
-        if (game.getPiece(position.getRow(),position.getCol()).getColor() == Color.LIGHT){
+        if (game.getPiece(position) == null) {
+            btnBoard[position.getRow()][position.getCol()].setImageResource(0);
+        } else if (game.getPiece(position).getColor() == Color.LIGHT){
             btnBoard[position.getRow()][position.getCol()].setImageResource(R.drawable.light_piece);
 
-        } else if (game.getPiece(position.getRow(),position.getCol()).getColor() == Color.DARK){
+        } else if (game.getPiece(position).getColor() == Color.DARK){
             btnBoard[position.getRow()][position.getCol()].setImageResource(R.drawable.dark_piece);
         }
-
     }
 
     private void drawLightTile(int i, int j){
@@ -91,6 +97,8 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         btnBoard[i][j].setTag(i + "-" + j);
     }
 
+    Position from,to;
+
     @Override
     public void onClick(View view) {
         String tag = (String) view.getTag();
@@ -98,5 +106,28 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         int row = Integer.parseInt(tag.split("-")[0]);
         int col = Integer.parseInt(tag.split("-")[1]);
         Log.d(TAG, "onClick: row:" + row +" col:" + col);
+        Position selected = new Position(row,col);
+        // Piece selected = game.getPiece(new Position(row,col));
+
+        if (game.getPiece(selected) != null){
+            from = selected;
+            Log.d(TAG, "onClick: from = " + row + "," + col);
+        }
+        if (game.getPiece(selected) == null && from != null){
+            to = selected;
+
+            Log.d(TAG, "onClick: to = " + row + "," + col);
+            makeMove(new Move(from,to));
+            
+        }
+    }
+    
+    private void makeMove(Move move){
+        Log.d(TAG, "makeMove: ");
+        game.movePiece(move);
+        to = null;
+        from = null;
+
+        updateBoard();
     }
 }

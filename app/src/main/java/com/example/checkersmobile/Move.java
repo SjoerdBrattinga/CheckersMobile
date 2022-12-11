@@ -28,10 +28,10 @@ public class Move {
     }
 
     public boolean isUp() {
-        return getRow2() - getRow1() > 0;
+        return getRow2() - getRow1() < 0;
     }
     public boolean isDown() {
-        return getRow2() - getRow1() < 0;
+        return getRow2() - getRow1() > 0;
     }
     public boolean isDiagonal() {
         return Math.abs(getRow2() - getRow1()) == Math.abs(getCol2() - getCol1());
