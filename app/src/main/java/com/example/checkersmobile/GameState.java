@@ -11,7 +11,7 @@ public class GameState {
     private final int boardSize = 8;
     private final int startingPieces = 12;
     private final int startingRows = 3;
-    private Color turn;
+    private Color turn = Color.LIGHT;
     private Piece[][] board;
 
     public GameState(){
