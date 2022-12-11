@@ -38,18 +38,11 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
                 String buttonId = "imgBtn_" + i + j;
                 int btnId = getResources().getIdentifier(buttonId, "id", getPackageName());
                 btnBoard[i][j] = findViewById(btnId);
-                if (i % 2 == 0) {
-                    if (j % 2 == 0) {
-                        drawLightTile(i,j);
-                    } else {
-                        drawDarkTile(i,j);
-                    }
+                //Log.d(TAG, "drawBoard: i" + i + " j:" + j + "  % 2 = " + (i + j) % 2 );
+                if ((i + j) % 2 == 0) {
+                    drawLightTile(i,j);
                 }  else {
-                    if (j % 2 == 0) {
-                        drawDarkTile(i,j);
-                    } else {
-                        drawLightTile(i,j);
-                    }
+                    drawDarkTile(i,j);
                 }
             }
         }
@@ -58,15 +51,28 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     private void updateBoard(){
         for (int i = 0; i < game.getBoardSize(); i++) {
             for (int j = 0; j < game.getBoardSize(); j++) {
-                if(game.getPiece(i,j) != null){
-                    drawPiece(game.getPiece(i,j).getPosition());
+                Piece piece = game.getPiece(i,j);
+                if(piece != null){
+                    drawPiece(piece);
                 }
             }
         }
     }
 
+    private void drawPiece(Piece piece){
+        if (piece.getColor() == Color.LIGHT){
+            btnBoard[piece.getPosition().getRow()][piece.getPosition().getCol()]
+                    .setImageResource(R.drawable.light_piece);
+
+        } else if (piece.getColor() == Color.DARK){
+            btnBoard[piece.getPosition().getRow()][piece.getPosition().getCol()]
+                    .setImageResource(R.drawable.dark_piece);
+        }
+
+    }
+
     private void drawPiece(Position position){
-        if(game.getPiece(position.getRow(),position.getCol()).getColor() == Color.LIGHT){
+        if (game.getPiece(position.getRow(),position.getCol()).getColor() == Color.LIGHT){
             btnBoard[position.getRow()][position.getCol()].setImageResource(R.drawable.light_piece);
 
         } else if (game.getPiece(position.getRow(),position.getCol()).getColor() == Color.DARK){

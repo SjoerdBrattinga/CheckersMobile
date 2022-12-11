@@ -20,30 +20,15 @@ public class GameState {
     }
 
     private void initBoard(Piece[][] board){
-        for (int i = 0; i < startingRows; i++){
+        for (int i = 0; i < boardSize; i++){
             for (int j = 0; j < boardSize; j++){
-                if(j % 2 == 0){
-                    if(i % 2 == 1){
+                if((i + j) % 2 == 1) {
+                    if (i < startingRows){
                         board[i][j] = new Piece(new Position(i,j), Color.DARK);
+                    } else if (i >= boardSize - startingRows ){
+                        board[i][j] = new Piece(new Position(i,j), Color.LIGHT);
                     }
-                } else{
-                    if(i % 2 == 0){
-                        board[i][j] = new Piece(new Position(i,j), Color.DARK);
-                    }
-                }
-            }
-        }
 
-        for (int i = boardSize - startingRows; i < boardSize; i++){
-            for (int j = 0; j < boardSize; j++){
-                if(j % 2 == 0){
-                    if(i % 2 == 1){
-                        board[i][j] = new Piece(new Position(i,j), Color.LIGHT);
-                    }
-                } else{
-                    if(i % 2 == 0){
-                        board[i][j] = new Piece(new Position(i,j), Color.LIGHT);
-                    }
                 }
             }
         }
@@ -84,10 +69,6 @@ public class GameState {
             }
         }
         return piecePositions;
-    }
-
-    public void setBoard(Piece[][] board) {
-        this.board = board;
     }
 
     private void setPiece(Piece piece, Position position){
