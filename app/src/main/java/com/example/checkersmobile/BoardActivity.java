@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
+import java.util.ArrayList;
+
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener{
     private final String TAG = "BoardActivity";
 
@@ -23,11 +25,11 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 
     private void newGame(){
         game = new GameState();
-        drawBoardTiles();
-        //updateBoard()
+        drawBoard();
+        updateBoard();
     }
 
-    private void drawBoardTiles(){
+    private void drawBoard(){
         int size = 8;
         btnBoard = new ImageButton[size][size];
 
@@ -51,6 +53,26 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
                 }
             }
         }
+    }
+
+    private void updateBoard(){
+        for (int i = 0; i < game.getBoardSize(); i++) {
+            for (int j = 0; j < game.getBoardSize(); j++) {
+                if(game.getPiece(i,j) != null){
+                    drawPiece(game.getPiece(i,j).getPosition());
+                }
+            }
+        }
+    }
+
+    private void drawPiece(Position position){
+        if(game.getPiece(position.getRow(),position.getCol()).getColor() == Color.LIGHT){
+            btnBoard[position.getRow()][position.getCol()].setImageResource(R.drawable.light_piece);
+
+        } else if (game.getPiece(position.getRow(),position.getCol()).getColor() == Color.DARK){
+            btnBoard[position.getRow()][position.getCol()].setImageResource(R.drawable.dark_piece);
+        }
+
     }
 
     private void drawLightTile(int i, int j){
