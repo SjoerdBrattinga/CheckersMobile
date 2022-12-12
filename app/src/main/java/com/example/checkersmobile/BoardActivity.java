@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -13,6 +14,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     private final String TAG = "BoardActivity";
 
     private GameState game;
+    private TextView currentPlayerTxt, fromPosTxt, toPosTxt;
     private ImageButton[][] btnBoard;
 
     @Override
@@ -27,6 +29,35 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         game = new GameState();
         drawBoard();
         updateBoard();
+        setCurrentPlayerText();
+    }
+
+    private void setCurrentPlayerText(){
+        currentPlayerTxt = findViewById(R.id.playerView);
+        currentPlayerTxt.setText("Current player: " + game.getTurn().toString());
+    }
+
+    private void setToPositionText(Position selected){
+        toPosTxt = findViewById(R.id.toView);
+        if(selected == null){
+            //selected += "Select a position";
+            toPosTxt.setText("To: Select a position");
+        } else {
+            //toTxt += "row: " + to1.getRow() + " col: " + to1.getCol();
+            toPosTxt.setText("To: row: " + selected.getRow() + " col: " + selected.getCol());
+        }
+    }
+
+    private void setFromPositionText(Position selected){
+        fromPosTxt = findViewById(R.id.fromView);
+
+        if(selected == null){
+            //fromTxt += "Select a position";
+            fromPosTxt.setText("From: Select a position");
+        } else {
+
+            fromPosTxt.setText("From: row: " + selected.getRow() + " col: " + selected.getCol());
+        }
     }
 
     private void drawBoard(){
@@ -111,23 +142,41 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 
         if (game.getPiece(selected) != null){
             from = selected;
-            Log.d(TAG, "onClick: from = " + row + "," + col);
-        }
-        if (game.getPiece(selected) == null && from != null){
-            to = selected;
 
-            Log.d(TAG, "onClick: to = " + row + "," + col);
-            makeMove(new Move(from,to));
-            
+            //Log.d(TAG, "onClick: from = " + row + "," + col);
+        } else if (from != null ){
+            if (from.equals(selected)){
+                from = null;
+
+            } else if (game.getPiece(selected) == null) {
+                to = selected;
+
+                //Log.d(TAG, "onClick: to = " + row + "," + col);
+                makeMove(new Move(from,selected));
+            }
         }
+        setFromPositionText(from);
+        setToPositionText(to);
     }
     
     private void makeMove(Move move){
         Log.d(TAG, "makeMove: ");
-        game.movePiece(move);
-        to = null;
-        from = null;
+        if (game.isMoveLegal(move)){
+            game.movePiece(move);
+            updateBoard();
+        } else {
+            //illegal move
+        }
 
-        updateBoard();
+        if (!game.playerHasMoves()){
+            endTurn();
+        }
+    }
+
+    private void endTurn(){
+        //to = null;
+        //from = null;
+        game.switchTurn();
+        setCurrentPlayerText();
     }
 }

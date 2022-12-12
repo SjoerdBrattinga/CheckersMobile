@@ -140,7 +140,13 @@ public class GameState {
         return boardSize;
     }
 
-    private void switchTurn(){
-        turn = turn == Color.LIGHT ? Color.DARK : Color.LIGHT;
+    public void switchTurn(){
+        turn = turn.getOpponent();
+    }
+
+    public ArrayList<Move> getPossibleMoves() {
+        ArrayList<Move> possibleMoves = new ArrayList<>();
+
+        return possibleMoves;
     }
 }

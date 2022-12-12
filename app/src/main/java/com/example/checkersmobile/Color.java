@@ -1,6 +1,9 @@
 package com.example.checkersmobile;
 
 public enum Color {
-    LIGHT,
-    DARK
+    LIGHT, DARK;
+
+    public Color getOpponent() {
+        return this == LIGHT ? DARK : LIGHT;
+    }
 }
