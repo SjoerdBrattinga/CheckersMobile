@@ -36,6 +36,16 @@ public class Move {
     public boolean isDiagonal() {
         return Math.abs(getRow2() - getRow1()) == Math.abs(getCol2() - getCol1());
     }
+    public boolean isJump(){
+        return  isDiagonal() && distance() == 2;
+    }
+
+    public Position getInBetween(){
+        int row = getRow2() + getRow1() / 2;
+        int col = getCol2() + getCol1() / 2;
+
+        return new Position(row,col);
+    }
 
     public int distance() {
         return Math.max(
