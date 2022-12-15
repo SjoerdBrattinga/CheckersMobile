@@ -21,6 +21,8 @@ public class GameController {
     public void handleInput(Position selected){
         Log.d(TAG, "handleInput: " + selected.toString());
 
+        activity.resetTileHighlights();
+
         if(gameState.isEmptyTile(selected)){
             if(selectedPiece != null){
                 onSelectTile(selected);
@@ -29,6 +31,7 @@ public class GameController {
         } else {
             onSelectPiece(selected);
         }
+        activity.highLightPossibleMoves();
 //        if (selectedPiece == null){
 //            if(gameState.getPiece(selected) != null && gameState.getPiece(selected).getColor() == gameState.getTurn()){
 //                selectedPiece = gameState.getPiece(selected);
@@ -44,27 +47,36 @@ public class GameController {
     }
 
     private void onSelectPiece(Position selected){
-
-        //check if piece is of current player
         if(gameState.getPiece(selected).getColor() == gameState.getTurn()){
+
             if(selectedPiece == null){
-                //check if piece has moves
-                ArrayList<Move> possibleMoves = gameState.getPossibleMoves(gameState.getPiece(selected));
-                if(possibleMoves.size() > 0 ){
-                    selectedPiece = gameState.getPiece(selected);
-                    ArrayList<Position> tilesToHighlight =new ArrayList<>();
-
-                    for (int i = 0; i < possibleMoves.size(); i++) {
-                        tilesToHighlight.add(possibleMoves.get(i).getDestination());
-                    }
-
-                    activity.setHighlightedTiles(tilesToHighlight);
+                selectedPiece = gameState.getPiece(selected);
+                ArrayList<Move> possibleMoves = gameState.getPossibleMoves(selectedPiece);
+                if(possibleMoves.size() > 0){
+                    activity.setHighlightedTiles(getMoveDestinations(possibleMoves));
+                } else {
+                    selectedPiece = null;
                 }
 
-            } else if (selectedPiece.getPosition().equals(selected)){
+//            } else if (selectedPiece.getPosition().equals(selected)){
+//                selectedPiece = null;
+            } else {
                 selectedPiece = null;
+                handleInput(selected);
             }
+
         }
+    }
+
+    private ArrayList<Position> getMoveDestinations(ArrayList<Move> moves) {
+        ArrayList<Position> moveDestinations = new ArrayList<>();
+
+        for (int i = 0; i < moves.size(); i++) {
+            moveDestinations.add(moves.get(i).getDestination());
+        }
+
+        return moveDestinations;
+        //activity.setHighlightedTiles(tilesToHighlight);
     }
 
     private void onSelectTile(Position selected){
@@ -135,10 +147,21 @@ public class GameController {
         }
     }
 
-    public void getPossibleMoves(){
-        //ArrayList<Move> moves = gameState.getPossibleMoves();
+    public ArrayList<Position> getPossibleMoves(Piece piece){
 
-        //return moves;
+        ArrayList<Move> possibleMoves = gameState.getPossibleMoves(piece);
+        ArrayList<Position> moveDestinations = new ArrayList<>();
+
+        if(possibleMoves.size() > 0 ){
+            //selectedPiece = piece;
+            for (int i = 0; i < possibleMoves.size(); i++) {
+                moveDestinations.add(possibleMoves.get(i).getDestination());
+            }
+
+            //activity.setHighlightedTiles(tilesToHighlight);
+        }
+
+        return moveDestinations;
     }
 
 

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CheckersMobile</string>
+    <string name="PlayersTurn">\'s turn!</string>
 </resources>
