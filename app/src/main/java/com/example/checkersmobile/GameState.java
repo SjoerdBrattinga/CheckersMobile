@@ -13,6 +13,7 @@ public class GameState {
     private final int startingRows = 3;
     private Color turn = Color.LIGHT;
     private Piece[][] board;
+    private ArrayList<Move> moves;
 
     public GameState(){
         board = new Piece[boardSize][boardSize];
@@ -71,6 +72,18 @@ public class GameState {
         return piecePositions;
     }
 
+    public ArrayList<Piece> getPieces(Color playerColor){
+        ArrayList<Piece> pieces = new ArrayList<>();
+        for (int i = 0; i < boardSize; i++) {
+            for (int j = 0; j < boardSize; j++) {
+                if (board[i][j] != null && board[i][j].getColor() == playerColor) {
+                    pieces.add(board[i][j]);
+                }
+            }
+        }
+        return pieces;
+    }
+
     public ArrayList<Position> getAllPiecePositions(){
         ArrayList<Position> piecePositions = new ArrayList<>();
         for (int i = 0; i < boardSize; i++) {
@@ -83,8 +96,6 @@ public class GameState {
         return piecePositions;
     }
 
-
-
     public void setPiece(Piece piece, Position position){
         board[position.getRow()][position.getCol()] = piece;
     }
@@ -93,19 +104,25 @@ public class GameState {
         Log.d(TAG, "movePiece: ");
         Piece piece = getPiece(move.getCurrent());
         if(piece.isMoveLegal(this, move)){
-            Log.d(TAG, "movePiece: isLegal");
             piece.move(this, move);
         }
 
-        boolean noMoreMoves = true;
-        if(noMoreMoves){
-            switchTurn();
-        }
+//        boolean noMoreMoves = true;
+//
+//        if(noMoreMoves){
+//            switchTurn();
+//        }
 
     }
 
+    public boolean playerHasMoves(){
+        return false;
+    }
+
     public boolean isMoveLegal(Move move){
-        if (    !isOnBoard(move.getCol1()) ||
+        if(getPiece(move.getCurrent()).getColor() != getTurn()){
+            return false;
+        } else if (    !isOnBoard(move.getCol1()) ||
                 !isOnBoard(move.getCol2()) ||
                 !isOnBoard(move.getRow1()) ||
                 !isOnBoard(move.getRow2())) {
@@ -120,20 +137,25 @@ public class GameState {
         } else {
             return true;
         }
-
-
     }
 
     public Color getTurn() {
         return turn;
     }
 
+    public void setTurn (Color color) {
+        turn = color;
+    }
     public Piece getPiece(int row, int col){
         return board[row][col];
     }
 
     public Piece getPiece(Position position){
         return board[position.getRow()][position.getCol()];
+    }
+
+    public Boolean isEmptyTile(Position position){
+        return getPiece(position) == null;
     }
 
     public int getBoardSize() {
@@ -144,9 +166,47 @@ public class GameState {
         turn = turn.getOpponent();
     }
 
-    public ArrayList<Move> getPossibleMoves() {
+//    public ArrayList<Move> getMovablePiecePositions() {
+//        ArrayList<Move> possibleMoves = new ArrayList<>();
+//        ArrayList<Piece> playerPieces = getPieces(turn);
+//
+//        for (int i = 0; i < playerPieces.size(); i++) {
+//            Position current = playerPieces.get(i).getPosition();
+//            Position[] connected = current.getConnected();
+//            for (int j = 0; j < connected.length; j++) {
+//                Move move = new Move(current, connected[j]);
+//                if(isMoveLegal(move)){
+//                    possibleMoves.add(move);
+//                }
+//            }
+//        }
+//        return possibleMoves;
+//    }
+    public ArrayList<Position> getMovablePiecePositions() {
+        ArrayList<Position> piecePositions = new ArrayList<>();
+        ArrayList<Piece> playerPieces = getPieces(turn);
+
+        for (int i = 0; i < playerPieces.size(); i++) {
+            if(getPossibleMoves(playerPieces.get(i)).size() > 0){
+                piecePositions.add(playerPieces.get(i).getPosition());
+            }
+        }
+        return piecePositions;
+    }
+    public ArrayList<Move> getPossibleMoves(Piece piece) {
         ArrayList<Move> possibleMoves = new ArrayList<>();
+
+        Position current = piece.getPosition();
+        Position[] connected = piece.getPosition().getConnected();
+        for (int j = 0; j < connected.length; j++) {
+            Move move = new Move(current, connected[j]);
+            if(isMoveLegal(move) && piece.isMoveLegal(this,move)){
+                possibleMoves.add(move);
+            }
+        }
 
         return possibleMoves;
     }
+
+
 }

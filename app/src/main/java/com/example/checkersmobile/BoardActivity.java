@@ -13,28 +13,32 @@ import java.util.ArrayList;
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener{
     private final String TAG = "BoardActivity";
 
-    private GameState game;
+    //private GameState game;
     private TextView currentPlayerTxt, fromPosTxt, toPosTxt;
     private ImageButton[][] btnBoard;
+    private ArrayList<Position> highlightedTiles;
+    private GameController controller;
+    private int boardSize;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_board);
 
-        newGame();
+        //game = new GameState();
+        controller = new GameController(new GameState(), this);
+        //boardSize = controller.getBoardSize();
+        highlightedTiles = new ArrayList<>();
+
+
     }
 
-    private void newGame(){
-        game = new GameState();
-        drawBoard();
-        updateBoard();
-        setCurrentPlayerText();
-    }
 
-    private void setCurrentPlayerText(){
+    public void setCurrentPlayerText(){
         currentPlayerTxt = findViewById(R.id.playerView);
-        currentPlayerTxt.setText("Current player: " + game.getTurn().toString());
+        currentPlayerTxt.setText("Current player: " + controller.getCurrentPlayer().toString());
     }
 
     private void setToPositionText(Position selected){
@@ -60,12 +64,11 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private void drawBoard(){
-        int size = game.getBoardSize();
-        btnBoard = new ImageButton[size][size];
+    public void drawBoard(int rows, int columns){
+        btnBoard = new ImageButton[rows][columns];
 
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
                 String buttonId = "imgBtn_" + i + j;
                 int btnId = getResources().getIdentifier(buttonId, "id", getPackageName());
                 btnBoard[i][j] = findViewById(btnId);
@@ -79,21 +82,14 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private void updateBoard(){
-//        ArrayList<Position> positions = game.getAllPiecePositions();
-//        for (int i = 0; i < positions.size(); i++) {
-//            drawPiece(positions.get(i));
-//        }
-//            Piece piece = game.getPiece(positions.get(i));
-//            if(piece != null){
-//                drawPiece(piece);
+//    public void updateBoard(){
+//        for (int i = 0; i < boardSize; i++) {
+//            for (int j = 0; j < boardSize; j++) {
+//                drawPiece(new Position(i,j));
 //            }
-        for (int i = 0; i < game.getBoardSize(); i++) {
-            for (int j = 0; j < game.getBoardSize(); j++) {
-                drawPiece(new Position(i,j));
-            }
-        }
-    }
+//        }
+//
+//    }
 
     private void drawPiece(Piece piece){
         if (piece.getColor() == Color.LIGHT){
@@ -104,22 +100,45 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
             btnBoard[piece.getPosition().getRow()][piece.getPosition().getCol()]
                     .setImageResource(R.drawable.dark_piece);
         }
-
     }
 
-    private void drawPiece(Position position){
-        if (game.getPiece(position) == null) {
-            btnBoard[position.getRow()][position.getCol()].setImageResource(0);
-        } else if (game.getPiece(position).getColor() == Color.LIGHT){
-            btnBoard[position.getRow()][position.getCol()].setImageResource(R.drawable.light_piece);
 
-        } else if (game.getPiece(position).getColor() == Color.DARK){
-            btnBoard[position.getRow()][position.getCol()].setImageResource(R.drawable.dark_piece);
+
+    private void highlightTiles(ArrayList<Position> tiles, TileResource color){
+        for (int i = 0; i < tiles.size(); i++) {
+            btnBoard[tiles.get(i).getRow()][tiles.get(i).getCol()]
+                    .setBackgroundResource(color.drawableId);
         }
     }
 
+    public void highLightPossibleMoves(){
+        highlightTiles(highlightedTiles, TileResource.GREEN);
+    }
+
+    public void resetTileHighlights(){
+        highlightTiles(highlightedTiles, TileResource.DARK);
+        highlightedTiles.clear();
+    }
+
+    private void setTileBackground(Position position, TileResource color){
+        btnBoard[position.getRow()][position.getCol()].setBackgroundResource(color.drawableId);
+
+
+    }
+
+//    private void drawPiece(Position position){
+//        if (game.getPiece(position) == null) {
+//            btnBoard[position.getRow()][position.getCol()].setImageResource(0);
+//        } else if (game.getPiece(position).getColor() == Color.LIGHT){
+//            btnBoard[position.getRow()][position.getCol()].setImageResource(R.drawable.light_piece);
+//
+//        } else if (game.getPiece(position).getColor() == Color.DARK){
+//            btnBoard[position.getRow()][position.getCol()].setImageResource(R.drawable.dark_piece);
+//        }
+//    }
+
     private void drawLightTile(int i, int j){
-        btnBoard[i][j].setBackgroundResource(R.drawable.light_tile);
+        btnBoard[i][j].setBackgroundResource(TileResource.LIGHT.drawableId);
     }
 
     private void drawDarkTile(int i, int j){
@@ -137,46 +156,43 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         int row = Integer.parseInt(tag.split("-")[0]);
         int col = Integer.parseInt(tag.split("-")[1]);
         Log.d(TAG, "onClick: row:" + row +" col:" + col);
-        Position selected = new Position(row,col);
-        // Piece selected = game.getPiece(new Position(row,col));
 
-        if (game.getPiece(selected) != null){
-            from = selected;
+        controller.handleInput(new Position(row,col));
 
-            //Log.d(TAG, "onClick: from = " + row + "," + col);
-        } else if (from != null ){
-            if (from.equals(selected)){
-                from = null;
-
-            } else if (game.getPiece(selected) == null) {
-                to = selected;
-
-                //Log.d(TAG, "onClick: to = " + row + "," + col);
-                makeMove(new Move(from,selected));
-            }
-        }
-        setFromPositionText(from);
-        setToPositionText(to);
     }
     
-    private void makeMove(Move move){
-        Log.d(TAG, "makeMove: ");
-        if (game.isMoveLegal(move)){
-            game.movePiece(move);
-            updateBoard();
-        } else {
-            //illegal move
-        }
+//    public void makeMove(Move move){
+//        Log.d(TAG, "makeMove: ");
+//        if (game.isMoveLegal(move)){
+//            game.movePiece(move);
+//            updateBoard();
+//        } else {
+//            //illegal move
+//        }
+//
+//        if (!game.playerHasMoves()){
+//            endTurn();
+//        }
+//    }
 
-        if (!game.playerHasMoves()){
-            endTurn();
-        }
+//    private void endTurn(){
+//        game.switchTurn();
+//        setCurrentPlayerText();
+//    }
+
+    public void setHighlightedTiles(ArrayList<Position> highlightedTiles) {
+        this.highlightedTiles = highlightedTiles;
     }
 
-    private void endTurn(){
-        //to = null;
-        //from = null;
-        game.switchTurn();
-        setCurrentPlayerText();
+    public void removePiece(int i, int j) {
+        btnBoard[i][j].setImageResource(0);
+    }
+
+    public void drawDarkPiece(int i, int j) {
+        btnBoard[i][j].setImageResource(R.drawable.dark_piece);
+    }
+
+    public void drawLightPiece(int i, int j) {
+        btnBoard[i][j].setImageResource(R.drawable.light_piece);
     }
 }

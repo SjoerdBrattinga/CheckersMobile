@@ -2,6 +2,8 @@ package com.example.checkersmobile;
 
 import android.util.Log;
 
+import java.util.ArrayList;
+
 public class Piece {
     private final String TAG = "Piece";
     private Position position;
@@ -32,10 +34,7 @@ public class Piece {
     }
 
     public boolean isMoveLegal(GameState game, Move move){
-        if(game.getTurn() != color){
-            Log.d(TAG, "isMoveLegal: Can't move other player's piece!");
-            return false;
-        } else if (!move.isDiagonal()) {
+        if (!move.isDiagonal()) {
             Log.d(TAG, "isMoveLegal: Move must be diagonal!");
             return false;
         } else if (!isKing) {
@@ -51,7 +50,28 @@ public class Piece {
             Log.d(TAG, "isMoveLegal: Illegal move distance!");
             return false;
         }
+        if (game.getPiece(move.getDestination()) != null){
+            Log.d(TAG, "isMoveLegal: Tile occupied");
+            return false;
+        }
         Log.d(TAG, "isMoveLegal: Yup!");
         return true;
     }
+
+//    public ArrayList<Move> getMoves(GameState game){
+//        ArrayList<Move> moves;
+//        int direction;
+//        if(color == Color.LIGHT){
+//            direction = 1;
+//        } else  {
+//            direction = -1;
+//        }
+//        if (game.isMoveLegal(new Move(position , new Position(position.getRow() + direction, position.getCol() -1)))){
+//
+//        }
+//
+//
+//
+//
+//    }
 }
