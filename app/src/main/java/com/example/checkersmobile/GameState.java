@@ -2,6 +2,8 @@ package com.example.checkersmobile;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import java.util.Arrays;
 import java.util.ArrayList;
 
@@ -9,7 +11,6 @@ import java.util.ArrayList;
 public class GameState {
     private final String TAG = "GameState";
     private final int boardSize = 8;
-    //private final int startingPieces = 12;
     private final int startingRows = 3;
     private Color turn = Color.LIGHT;
     private Piece[][] board;
@@ -19,6 +20,11 @@ public class GameState {
         board = new Piece[boardSize][boardSize];
         moves = new ArrayList<>();
         initBoard(board);
+        if(canJump(new Position(5,0))){
+            Log.d(TAG, "GameState: canjump");
+        }
+        
+        //possibleMoves = getPossibleMoves();
     }
 
     private void initBoard(Piece[][] board){
@@ -30,10 +36,12 @@ public class GameState {
                     } else if (i >= boardSize - startingRows ){
                         board[i][j] = new Piece(new Position(i,j), Color.LIGHT);
                     }
-
                 }
             }
         }
+
+        //test
+        board[4][1] = new Piece(new Position(4,1), Color.DARK);
         printBoard(board);
     }
 
@@ -58,7 +66,7 @@ public class GameState {
         return board;
     }
 
-    public ArrayList<Position> getPiecePositionsByColor(Color color){
+    public ArrayList<Position> getPiecePositions(Color color){
         ArrayList<Position> piecePositions = new ArrayList<>();
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
@@ -97,7 +105,7 @@ public class GameState {
         return piecePositions;
     }
 
-    public void setPiece(Piece piece, Position position){
+    public void setPiece(Piece piece, @NonNull Position position){
         board[position.getRow()][position.getCol()] = piece;
     }
 
@@ -118,14 +126,14 @@ public class GameState {
 
     }
 
-    public boolean isMoveLegal(Move move){
+    public boolean isMoveLegal(@NonNull Move move){
         return getPiece(move.getCurrent()).getColor() == getTurn()
                 && isOnBoard(move.getDestination())
                 && isOnBoard(move.getCurrent())
                 && getPiece(move.getDestination())  == null;
     }
 
-    public boolean isOnBoard(Position position){
+    public boolean isOnBoard(@NonNull Position position){
         int[] coordinates = {
                 position.getRow(),
                 position.getCol()
@@ -143,14 +151,11 @@ public class GameState {
         return turn;
     }
 
-    public void setTurn (Color color) {
-        turn = color;
-    }
     public Piece getPiece(int row, int col){
         return board[row][col];
     }
 
-    public Piece getPiece(Position position){
+    public Piece getPiece(@NonNull Position position){
         return board[position.getRow()][position.getCol()];
     }
 
@@ -167,27 +172,55 @@ public class GameState {
         turn = turn.getOpponent();
     }
 
-//    public ArrayList<Move> getMovablePiecePositions() {
-//        ArrayList<Move> possibleMoves = new ArrayList<>();
+    public ArrayList<Move> getPossibleMoves() {
+        ArrayList<Position> piecePositions = getPiecePositions(turn);
+
+        ArrayList<Move> possibleMoves = new ArrayList<>();
+
+        if (moves.size() > 0 && moves.get(moves.size() - 1).isJump()){
+            //get possible moves for last moved piece
+            possibleMoves.addAll(getPossibleMoves(moves.get(moves.size() - 1).getDestination(), true));
+        } else if (hasJumps(piecePositions)){
+            for (Position position : piecePositions) {
+                ArrayList<Move> test = getPossibleMoves(position, true);
+                possibleMoves.addAll(test);
+            }
+        } else{
+            for (Position position : piecePositions) {
+                possibleMoves.addAll(getPossibleMoves(position, false));
+            }
+
+
+//            for (int i = 0; i < playerPieces.size(); i++) {
+//                //Position current = playerPieces.get(i).getPosition();
+//                possibleMoves.addAll(getPossibleMoves(playerPieces.get(i)));
+////                Position[] connected = current.getDiagonal(1);
+////
+////                for (int j = 0; j < connected.length; j++) {
+////                    Move move = new Move(current, connected[j]);
+////
+////                    if(isMoveLegal(move)){
+////                        possibleMoves.add(move);
+////                    }
+////                }
+//            }
+        }
+        return possibleMoves;
+    }
+
+//    public ArrayList<Position> getPossibleMoves() {
+//        ArrayList<Position> piecePositions = new ArrayList<>();
 //        ArrayList<Piece> playerPieces = getPieces(turn);
 //
 //        for (int i = 0; i < playerPieces.size(); i++) {
-//            Position current = playerPieces.get(i).getPosition();
-//            Position[] connected = current.getConnected();
-//            for (int j = 0; j < connected.length; j++) {
-//                Move move = new Move(current, connected[j]);
-//                if(isMoveLegal(move)){
-//                    possibleMoves.add(move);
-//                }
+//            if(getPossibleMoves(playerPieces.get(i)).size() > 0){
+//                piecePositions.add(playerPieces.get(i).getPosition());
 //            }
 //        }
-//        return possibleMoves;
+//        return piecePositions;
 //    }
-    public ArrayList<Position> getMovablePiecePositions() {
-        ArrayList<Position> piecePositions = new ArrayList<>();
-        ArrayList<Piece> playerPieces = getPieces(turn);
 
-    public ArrayList<Move> getPossibleMoves(Piece piece) {
+    private ArrayList<Move> getPossibleMoves4(@NonNull Piece piece) {
         ArrayList<Move> possibleMoves = new ArrayList<>();
         Position current = piece.getPosition();
         Position[] destinations;
@@ -209,28 +242,56 @@ public class GameState {
         return possibleMoves;
     }
 
+    private ArrayList<Move> getPossibleMoves(Position piecePosition, boolean jump) {
+        ArrayList<Move> possibleMoves = new ArrayList<>();
+        Position[] destinations;
+
+        if(jump){
+            destinations = piecePosition.getDiagonal(2);
+
+        } else {
+            destinations = piecePosition.getDiagonal(1);
+        }
+
+        for (int j = 0; j < destinations.length; j++) {
+            Move move = new Move(piecePosition, destinations[j]);
+            if(isMoveLegal(move) && getPiece(piecePosition).isMoveLegal(this,move)){
+                possibleMoves.add(move);
+            }
+        }
+
+        return possibleMoves;
+    }
+
+    private boolean hasJumps(ArrayList<Position> piecePositions){
+        for (Position piece : piecePositions) {
+            if (canJump(piece)) return true;
+        }
+        return false;
+    }
+
     public boolean canJump(Position position){
         Position[] destinations = position.getDiagonal(2);
         for (Position destination : destinations) {
             Move move = new Move(position, destination);
 
-            if(isMoveLegal(move)
+            return isMoveLegal(move)
                     && move.isJump()
                     && getPiece(move.getInBetween()) != null
-                    && getPiece(move.getInBetween()).getColor() != turn){
-                Log.d(TAG, "canJump: True");
-                Log.d(TAG, "canJump: Move: " + move);
-
-                return true;
-            }
+                    && getPiece(move.getInBetween()).getColor() != turn;
         }
 
         return false;
     }
 
+
     public boolean playerHasMoves(){
         if (moves.size() > 0){
-            //check last move
+            Move lastMove = moves.get(moves.size() - 1);
+            if(canJump(lastMove.getDestination())){
+                return true;
+            }
+            //ArrayList<Move> possibleMoves = getPossibleMoves(getPiece(moves.get(moves.size() - 1).getDestination()));
         } else {
             //check all pieces
         }

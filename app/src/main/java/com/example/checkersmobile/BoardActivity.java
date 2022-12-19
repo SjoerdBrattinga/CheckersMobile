@@ -16,15 +16,15 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     private TextView currentPlayerTxt, fromPosTxt, toPosTxt;
     private ImageButton[][] btnBoard;
     private ArrayList<Position> highlightedTiles;
+    private Position highLightedPiece;
     private GameController controller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_board);
-
-        controller = new GameController(new GameState(), this);
         highlightedTiles = new ArrayList<>();
+        controller = new GameController(new GameState(), this);
     }
 
     public void setCurrentPlayerText(String player){
@@ -72,14 +72,27 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         highlightTiles(highlightedTiles, TileResource.GREEN);
     }
 
-    public void resetTileHighlights(){
-        if(highlightedTiles.size() > 0){
-            highlightTiles(highlightedTiles, TileResource.DARK);
-            highlightedTiles.clear();
+    public void highlightTiles1(ArrayList<Position> tiles, TileResource color){
+        setHighlightedTiles(tiles);
+        for (int i = 0; i < tiles.size(); i++) {
+            btnBoard[tiles.get(i).getRow()][tiles.get(i).getCol()]
+                    .setBackgroundResource(color.drawableId);
         }
     }
 
-    private void setTileBackground(Position position, TileResource color){
+    public void resetTileHighlights(){
+        if(highlightedTiles.size() > 0){
+            highlightTiles1(highlightedTiles, TileResource.DARK);
+            highlightedTiles.clear();
+        }
+        if(highLightedPiece != null){
+            highLightTile(highLightedPiece, TileResource.DARK);
+            highLightedPiece = null;
+        }
+    }
+
+    public void highLightTile(Position position, TileResource color){
+        highLightedPiece = position;
         btnBoard[position.getRow()][position.getCol()].setBackgroundResource(color.drawableId);
     }
 

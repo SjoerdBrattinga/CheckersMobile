@@ -2,8 +2,6 @@ package com.example.checkersmobile;
 
 import android.util.Log;
 
-import java.util.ArrayList;
-
 public class Piece {
     private final String TAG = "Piece";
     private Position position;
@@ -69,20 +67,48 @@ public class Piece {
         return true;
     }
 
-//    public ArrayList<Move> getMoves(GameState game){
+//    public ArrayList<Move> getPossibleMoves(GameState game){
 //        ArrayList<Move> moves;
+//        ArrayList<Position> destinations = new ArrayList<>();
 //        int direction;
+//
 //        if(color == Color.LIGHT){
-//            direction = 1;
-//        } else  {
+//            Move move = new Move(position, position.getUpLeft());
+//        } else  if(color == Color.DARK){
 //            direction = -1;
 //        }
-//        if (game.isMoveLegal(new Move(position , new Position(position.getRow() + direction, position.getCol() -1)))){
+//    }
+//    public boolean hasJumps(GameState game){
+//        Position[] destinations = position.getDiagonal(2);
+//        for (Position destination : destinations) {
+//            Move move = new Move(position, destination);
 //
+//            return move.isJump()
+//                    //&& game.getPiece(move.getDestination()) == null
+//                    && game.getPiece(move.getInBetween()).getColor() != color
+//                    && game.isMoveLegal(move);
 //        }
 //
-//
-//
-//
+//        return false;
 //    }
+    public boolean hasJumps(GameState game){
+        Position[] destinations = position.getDiagonal(2);
+        for (Position destination : destinations) {
+            Move move = new Move(position, destination);
+
+            if(game.isMoveLegal(move)
+                    && move.isJump()
+                    && game.getPiece(move.getInBetween()) != null
+                    && game.getPiece(move.getInBetween()).getColor() != color){
+                Log.d(TAG, "hasJumps: True");
+                Log.d(TAG, "hasJumps: Move: " + move);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
 }
