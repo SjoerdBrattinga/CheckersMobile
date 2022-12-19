@@ -1,5 +1,7 @@
 package com.example.checkersmobile;
 
+import androidx.annotation.NonNull;
+
 public class Position {
     private final int row;
     private final int col;
@@ -17,29 +19,29 @@ public class Position {
         return col;
     }
 
-    public Position[] getConnected(){
+    public Position[] getDiagonal(int distance){
         return new Position[]{
-                getUpLeft(),
-                getUpRight(),
-                getDownLeft(),
-                getDownRight()
+                getUpLeft(distance),
+                getUpRight(distance),
+                getDownLeft(distance),
+                getDownRight(distance)
         };
     }
 
-    public Position getUpLeft(){
-        return new Position(row + 1, col - 1);
+    public Position getUpLeft(int distance){
+        return new Position(row - distance, col - distance);
     }
 
-    public Position getUpRight(){
-        return new Position(row + 1, col + 1);
+    public Position getUpRight(int distance){
+        return new Position(row - distance, col + distance);
     }
 
-    public Position getDownLeft(){
-        return new Position(row - 1, col - 1);
+    public Position getDownLeft(int distance){
+        return new Position(row + distance, col - distance);
     }
 
-    public Position getDownRight(){
-        return new Position(row - 1, col + 1);
+    public Position getDownRight(int distance){
+        return new Position(row + distance, col + distance);
     }
 
     @Override
@@ -55,6 +57,7 @@ public class Position {
         return true;
     }
 
+    @NonNull
     @Override
     public String toString(){
         return "row:" + this.row + " col:" + this.col;
