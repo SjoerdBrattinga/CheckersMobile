@@ -110,8 +110,8 @@ public class GameController {
     public boolean makeMove(Move move){
         if (gameState.isMoveLegal(move)){
             gameState.movePiece(move);
+            endTurn();
             return true;
-
         } else{
             return false;
         }

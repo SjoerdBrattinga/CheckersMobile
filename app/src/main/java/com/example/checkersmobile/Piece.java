@@ -31,30 +31,41 @@ public class Piece {
         game.setPiece(null, position);
         setPosition(move.getDestination());
         game.setPiece(this, position);
+
+        if(move.isJump()){
+            game.setPiece(null, move.getInBetween());
+        }
     }
 
     public boolean isMoveLegal(GameState game, Move move){
         if (!move.isDiagonal()) {
             Log.d(TAG, "isMoveLegal: Move must be diagonal!");
             return false;
-        } else if (!isKing) {
+        }
+//        if (game.getPiece(move.getDestination()) != null){
+//            Log.d(TAG, "isMoveLegal: Tile occupied");
+//            return false;
+//        }
+        if (!isKing) {
             if (color == Color.DARK && move.isUp()){
                 Log.d(TAG, "isMoveLegal: Wrong direction!");
                 return false;
             } else if (color == Color.LIGHT && move.isDown()){
                 Log.d(TAG, "isMoveLegal: Wrong direction!");
                 return false;
-            } 
+            }
         }
-        if (move.distance() > 1){
-            Log.d(TAG, "isMoveLegal: Illegal move distance!");
-            return false;
+        if (move.isJump()){
+            if (game.getPiece(move.getInBetween()) == null){
+                Log.d(TAG, "isMoveLegal: Can\'t jump empty tile!");
+                return false;
+            }
+            if (game.getPiece(move.getInBetween()).getColor() == this.color){
+                Log.d(TAG, "isMoveLegal: Can\'t capture your own piece!");
+                return false;
+            }
         }
-        if (game.getPiece(move.getDestination()) != null){
-            Log.d(TAG, "isMoveLegal: Tile occupied");
-            return false;
-        }
-        Log.d(TAG, "isMoveLegal: Yup!");
+
         return true;
     }
 

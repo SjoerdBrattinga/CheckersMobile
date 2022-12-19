@@ -17,6 +17,7 @@ public class GameState {
 
     public GameState(){
         board = new Piece[boardSize][boardSize];
+        moves = new ArrayList<>();
         initBoard(board);
     }
 
@@ -105,6 +106,8 @@ public class GameState {
         Piece piece = getPiece(move.getCurrent());
         if(piece.isMoveLegal(this, move)){
             piece.move(this, move);
+            moves.add(move);
+            //check capture
         }
 
 //        boolean noMoreMoves = true;
@@ -115,28 +118,25 @@ public class GameState {
 
     }
 
-    public boolean playerHasMoves(){
-        return false;
+    public boolean isMoveLegal(Move move){
+        return getPiece(move.getCurrent()).getColor() == getTurn()
+                && isOnBoard(move.getDestination())
+                && isOnBoard(move.getCurrent())
+                && getPiece(move.getDestination())  == null;
     }
 
-    public boolean isMoveLegal(Move move){
-        if(getPiece(move.getCurrent()).getColor() != getTurn()){
-            return false;
-        } else if (    !isOnBoard(move.getCol1()) ||
-                !isOnBoard(move.getCol2()) ||
-                !isOnBoard(move.getRow1()) ||
-                !isOnBoard(move.getRow2())) {
-            return false;
+    public boolean isOnBoard(Position position){
+        int[] coordinates = {
+                position.getRow(),
+                position.getCol()
+        };
+
+        for(int value : coordinates){
+            if(value < 0 || value >= boardSize){
+                return false;
+            }
         }
         return true;
-    }
-
-    private boolean isOnBoard(int i){
-        if (i < 0 || i >= boardSize){
-            return false;
-        } else {
-            return true;
-        }
     }
 
     public Color getTurn() {
@@ -163,6 +163,7 @@ public class GameState {
     }
 
     public void switchTurn(){
+        moves.clear();
         turn = turn.getOpponent();
     }
 
@@ -186,20 +187,20 @@ public class GameState {
         ArrayList<Position> piecePositions = new ArrayList<>();
         ArrayList<Piece> playerPieces = getPieces(turn);
 
-        for (int i = 0; i < playerPieces.size(); i++) {
-            if(getPossibleMoves(playerPieces.get(i)).size() > 0){
-                piecePositions.add(playerPieces.get(i).getPosition());
-            }
-        }
-        return piecePositions;
-    }
     public ArrayList<Move> getPossibleMoves(Piece piece) {
         ArrayList<Move> possibleMoves = new ArrayList<>();
-
         Position current = piece.getPosition();
-        Position[] connected = piece.getPosition().getConnected();
-        for (int j = 0; j < connected.length; j++) {
-            Move move = new Move(current, connected[j]);
+        Position[] destinations;
+
+        if(canJump(current)){
+            destinations = piece.getPosition().getDiagonal(2);
+        } else {
+            destinations = piece.getPosition().getDiagonal(1);
+        }
+
+        //Position[] connected = piece.getPosition().getDiagonal(1);
+        for (int j = 0; j < destinations.length; j++) {
+            Move move = new Move(current, destinations[j]);
             if(isMoveLegal(move) && piece.isMoveLegal(this,move)){
                 possibleMoves.add(move);
             }
@@ -208,5 +209,32 @@ public class GameState {
         return possibleMoves;
     }
 
+    public boolean canJump(Position position){
+        Position[] destinations = position.getDiagonal(2);
+        for (Position destination : destinations) {
+            Move move = new Move(position, destination);
+
+            if(isMoveLegal(move)
+                    && move.isJump()
+                    && getPiece(move.getInBetween()) != null
+                    && getPiece(move.getInBetween()).getColor() != turn){
+                Log.d(TAG, "canJump: True");
+                Log.d(TAG, "canJump: Move: " + move);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean playerHasMoves(){
+        if (moves.size() > 0){
+            //check last move
+        } else {
+            //check all pieces
+        }
+        return false;
+    }
 
 }
