@@ -1,5 +1,7 @@
 package com.example.checkersmobile;
 
+import androidx.annotation.NonNull;
+
 public class Move {
     private final Position current, destination;
 
@@ -41,8 +43,8 @@ public class Move {
     }
 
     public Position getInBetween(){
-        int row = getRow2() + getRow1() / 2;
-        int col = getCol2() + getCol1() / 2;
+        int row = (getRow2() + getRow1()) / 2;
+        int col = (getCol2() + getCol1()) / 2;
 
         return new Position(row,col);
     }
@@ -52,6 +54,12 @@ public class Move {
                 Math.abs(getRow2() - getRow1()),
                 Math.abs(getCol2() - getCol1())
         );
+    }
+
+    @NonNull
+    @Override
+    public String toString(){
+        return "current: " + this.current.toString() + " destination:" + this.destination.toString();
     }
 
 
