@@ -10,8 +10,6 @@ public class GameController {
     private BoardActivity activity;
     private Piece selectedPiece;
 
-    
-
     public GameController(GameState gameState, BoardActivity activity){
         this.gameState = gameState;
         this.activity = activity;
@@ -31,7 +29,7 @@ public class GameController {
         } else {
             onSelectPiece(selected);
         }
-        activity.highLightPossibleMoves();
+        //activity.highLightPossibleMoves();
 //        if (selectedPiece == null){
 //            if(gameState.getPiece(selected) != null && gameState.getPiece(selected).getColor() == gameState.getTurn()){
 //                selectedPiece = gameState.getPiece(selected);
@@ -106,7 +104,7 @@ public class GameController {
         int boardSize = gameState.getBoardSize();
         activity.drawBoard(boardSize,boardSize);
         updateBoard();
-
+        activity.setCurrentPlayerText(getCurrentPlayer().toString());
         ArrayList<Move> moves = gameState.getPossibleMoves();
         activity.highlightTiles1(getPiecePositions(moves), TileResource.GREEN);
         //activity.setCurrentPlayerText();
@@ -186,6 +184,9 @@ public class GameController {
         gameState.switchTurn();
         ArrayList<Move> moves = gameState.getPossibleMoves();
         activity.highlightTiles1(getPiecePositions(moves), TileResource.GREEN);
+        activity.setCurrentPlayerText(getCurrentPlayer().toString());
+        //ArrayList<Move> moves = gameState.getPossibleMoves();
+        //activity.highlightTiles1(getPiecePositions(moves), TileResource.GREEN);
 
     }
 
