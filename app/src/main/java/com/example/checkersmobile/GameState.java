@@ -97,13 +97,8 @@ public class GameState {
     }
 
     public void movePiece(Move move){
-        Log.d(TAG, "movePiece: " + move);
-        Piece piece = getPiece(move.getCurrent());
-        //if(piece.isMoveLegal(this, move)){
-            piece.move(this, move);
-            moves.add(move);
-            //check capture
-        //}
+        getPiece(move.getCurrent()).move(this, move);
+        moves.add(move);
     }
 
     public boolean isMoveLegal(@NonNull Move move){
@@ -185,10 +180,9 @@ public class GameState {
             destinations = piece.getPosition().getDiagonal(1);
         }
 
-        //Position[] connected = piece.getPosition().getDiagonal(1);
-        for (int j = 0; j < destinations.length; j++) {
-            Move move = new Move(current, destinations[j]);
-            if(isMoveLegal(move) && piece.isMoveLegal(this,move)){
+        for (Position destination : destinations) {
+            Move move = new Move(current, destination);
+            if (isMoveLegal(move) && piece.isMoveLegal(this, move)) {
                 possibleMoves.add(move);
             }
         }
@@ -207,9 +201,9 @@ public class GameState {
             destinations = piecePosition.getDiagonal(1);
         }
 
-        for (int j = 0; j < destinations.length; j++) {
-            Move move = new Move(piecePosition, destinations[j]);
-            if(isMoveLegal(move) && getPiece(piecePosition).isMoveLegal(this,move)){
+        for (Position destination : destinations) {
+            Move move = new Move(piecePosition, destination);
+            if (isMoveLegal(move) && getPiece(piecePosition).isMoveLegal(this, move)) {
                 possibleMoves.add(move);
             }
         }
@@ -221,6 +215,7 @@ public class GameState {
         for (Position piece : piecePositions) {
             if (canJump(piece)) return true;
         }
+
         return false;
     }
 
@@ -246,7 +241,6 @@ public class GameState {
             if(canJump(lastMove.getDestination())){
                 return true;
             }
-            //ArrayList<Move> possibleMoves = getPossibleMoves(getPiece(moves.get(moves.size() - 1).getDestination()));
         } else {
             //check all pieces
         }
