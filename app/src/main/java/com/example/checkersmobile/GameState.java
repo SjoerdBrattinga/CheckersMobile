@@ -14,11 +14,12 @@ public class GameState {
     private final int startingRows = 3;
     private Color turn = Color.LIGHT;
     private Piece[][] board;
-    private ArrayList<Move> moves;
+    private Move lastMove;
+    private ArrayList<Move> possibleMoves;
 
     public GameState(){
         board = new Piece[boardSize][boardSize];
-        moves = new ArrayList<>();
+        possibleMoves = new ArrayList<>();
         initBoard(board);
     }
 
@@ -98,7 +99,7 @@ public class GameState {
 
     public void movePiece(Move move){
         getPiece(move.getCurrent()).move(this, move);
-        moves.add(move);
+        lastMove = move;
     }
 
     public boolean isMoveLegal(@NonNull Move move){
@@ -143,29 +144,27 @@ public class GameState {
         return boardSize;
     }
 
-    public void switchTurn(){
-        moves.clear();
-        turn = turn.getOpponent();
-    }
-
     public ArrayList<Move> getPossibleMoves() {
-        ArrayList<Position> piecePositions = getPiecePositions(turn);
+
         ArrayList<Move> possibleMoves = new ArrayList<>();
 
-        if (moves.size() > 0 && moves.get(moves.size() - 1).isJump()){
-            //get possible moves for last moved piece
-            possibleMoves.addAll(getPossibleMoves(moves.get(moves.size() - 1).getDestination(), true));
-        } else if (hasJumps(piecePositions)){
-            for (Position position : piecePositions) {
-                ArrayList<Move> test = getPossibleMoves(position, true);
-                possibleMoves.addAll(test);
+        if (lastMove == null) {
+            ArrayList<Position> piecePositions = getPiecePositions(turn);
+
+            if (hasJumps(piecePositions)) {
+                for (Position position : piecePositions) {
+                    ArrayList<Move> test = getPossibleMoves(position, true);
+                    possibleMoves.addAll(test);
+                }
+            } else {
+                for (Position position : piecePositions) {
+                    possibleMoves.addAll(getPossibleMoves(position, false));
+                }
             }
-        } else{
-            for (Position position : piecePositions) {
-                possibleMoves.addAll(getPossibleMoves(position, false));
-            }
+        } else if (lastMove.isJump()){
+            possibleMoves.addAll(getPossibleMoves(lastMove.getDestination(), true));
         }
-        Log.d(TAG, "getPossibleMoves: " + possibleMoves);
+        this.possibleMoves = possibleMoves;
         return possibleMoves;
     }
 
@@ -236,14 +235,15 @@ public class GameState {
 
 
     public boolean playerHasMoves(){
-        if (moves.size() > 0){
-            Move lastMove = moves.get(moves.size() - 1);
-            if(canJump(lastMove.getDestination())){
-                return true;
-            }
-        } else {
-            //check all pieces
-        }
+        return !getPossibleMoves().isEmpty();
+    }
+
+    public void endTurn(){
+        lastMove = null;
+        turn = turn.getOpponent();
+    }
+
+    public boolean isGameOver(){
         return false;
     }
 

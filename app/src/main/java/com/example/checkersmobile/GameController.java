@@ -7,6 +7,7 @@ public class GameController {
     private GameState gameState;
     private BoardActivity activity;
     private Piece selectedPiece;
+    private ArrayList<Move> possibleMoves;
 
     public GameController(GameState gameState, BoardActivity activity){
         this.gameState = gameState;
@@ -20,8 +21,9 @@ public class GameController {
         updateBoard();
 
         activity.setCurrentPlayerText(getCurrentPlayer().toString());
-        ArrayList<Move> moves = gameState.getPossibleMoves();
-        activity.highlightTiles(getPiecePositions(moves), TileResource.GREEN);
+        //ArrayList<Move> moves = gameState.getPossibleMoves();
+        possibleMoves = gameState.getPossibleMoves();
+        activity.highlightTiles(getPiecePositions(possibleMoves), TileResource.GREEN);
     }
 
     public void updateBoard(){
@@ -39,7 +41,7 @@ public class GameController {
     }
 
     public void handleInput(Position selected){
-        activity.resetTileHighlights();
+        //activity.resetTileHighlights();
 
         if(gameState.isEmptyTile(selected)){
             if(selectedPiece != null){
@@ -54,14 +56,15 @@ public class GameController {
         if(gameState.getPiece(selected).getColor() == gameState.getTurn()){
 
             if(selectedPiece == null){
-                selectedPiece = gameState.getPiece(selected);
-                activity.highLightTile(selected, TileResource.BLUE);
-                ArrayList<Move> possibleMoves = gameState.getPossibleMoves(selectedPiece);
+                if(getPiecePositions(possibleMoves).contains(selected)){
+                    activity.resetTileHighlights();
+                    selectedPiece = gameState.getPiece(selected);
+                    activity.highLightTile(selected, TileResource.BLUE);
+                    ArrayList<Move> possibleMoves = gameState.getPossibleMoves(selectedPiece);
 
-                if(possibleMoves.size() > 0){
-                    activity.highlightTiles(getMoveDestinations(possibleMoves), TileResource.GREEN);
-                } else {
-                    selectedPiece = null;
+                    if(possibleMoves.size() > 0){
+                        activity.highlightTiles(getMoveDestinations(possibleMoves), TileResource.GREEN);
+                    }
                 }
             } else {
                 selectedPiece = null;
@@ -72,7 +75,15 @@ public class GameController {
 
     private void onSelectTile(Position selected){
         if(makeMove(new Move(selectedPiece.getPosition(), selected))){
-            selectedPiece = null;
+            activity.resetTileHighlights();
+
+            if(gameState.playerHasMoves()){
+                activity.highLightTile(selected, TileResource.GREEN);
+
+            } else {
+                selectedPiece = null;
+                endTurn();
+            }
             updateBoard();
         }
     }
@@ -82,15 +93,16 @@ public class GameController {
             return false;
         } else {
             gameState.movePiece(move);
-            endTurn();
             return true;
         }
     }
 
     public void endTurn(){
-        gameState.switchTurn();
-        ArrayList<Move> moves = gameState.getPossibleMoves();
-        activity.highlightTiles(getPiecePositions(moves), TileResource.GREEN);
+        gameState.endTurn();
+        //ArrayList<Move> moves = gameState.getPossibleMoves();
+        possibleMoves = gameState.getPossibleMoves();
+
+        activity.highlightTiles(getPiecePositions(possibleMoves), TileResource.GREEN);
         activity.setCurrentPlayerText(getCurrentPlayer().toString());
     }
 
