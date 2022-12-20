@@ -75,16 +75,19 @@ public class GameController {
 
     private void onSelectTile(Position selected){
         if(makeMove(new Move(selectedPiece.getPosition(), selected))){
+            updateBoard();
             activity.resetTileHighlights();
 
             if(gameState.playerHasMoves()){
                 activity.highLightTile(selected, TileResource.GREEN);
+                possibleMoves = gameState.getPossibleMoves();
+                onSelectPiece(selected);
 
             } else {
                 selectedPiece = null;
                 endTurn();
             }
-            updateBoard();
+
         }
     }
 
