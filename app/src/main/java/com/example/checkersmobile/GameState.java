@@ -15,11 +15,12 @@ public class GameState {
     private Color turn = Color.LIGHT;
     private Piece[][] board;
     private Move lastMove;
-    private ArrayList<Move> possibleMoves;
+
+    //private ArrayList<Move> possibleMoves;
 
     public GameState(){
         board = new Piece[boardSize][boardSize];
-        possibleMoves = new ArrayList<>();
+        //possibleMoves = new ArrayList<>();
         initBoard(board);
     }
 
@@ -28,9 +29,9 @@ public class GameState {
             for (int j = 0; j < boardSize; j++){
                 if((i + j) % 2 == 1) {
                     if (i < startingRows){
-                        board[i][j] = new Piece(new Position(i,j), Color.DARK);
+                        board[i][j] = new Man(new Position(i,j), Color.DARK);
                     } else if (i >= boardSize - startingRows ){
-                        board[i][j] = new Piece(new Position(i,j), Color.LIGHT);
+                        board[i][j] = new Man(new Position(i,j), Color.LIGHT);
                     }
                 }
             }
@@ -45,7 +46,11 @@ public class GameState {
                 if(board[i][j] == null){
                     boardStrArr[i][j] = "null";
                 } else {
-                    boardStrArr[i][j] = board[i][j].getColor().toString();
+                    if(board[i][j] instanceof King){
+                        boardStrArr[i][j] = "King";
+                    } else {
+                        boardStrArr[i][j] = board[i][j].getColor().toString();
+                    }
                 }
                 if(j + 1 == boardSize){
                     Log.d(TAG, Arrays.deepToString(boardStrArr[i]));
@@ -93,7 +98,7 @@ public class GameState {
         return piecePositions;
     }
 
-    public void setPiece(Piece piece, @NonNull Position position){
+    public void setPiece(Piece piece, Position position){
         board[position.getRow()][position.getCol()] = piece;
     }
 
@@ -102,7 +107,7 @@ public class GameState {
         lastMove = move;
     }
 
-    public boolean isMoveLegal(@NonNull Move move){
+    public boolean isMoveLegal(Move move){
         return getPiece(move.getCurrent()).getColor() == getTurn()
                 && isOnBoard(move.getDestination())
                 && isOnBoard(move.getCurrent())
@@ -164,7 +169,7 @@ public class GameState {
         } else if (lastMove.isJump()){
             possibleMoves.addAll(getPossibleMoves(lastMove.getDestination(), true));
         }
-        this.possibleMoves = possibleMoves;
+        //this.possibleMoves = possibleMoves;
         return possibleMoves;
     }
 
@@ -225,7 +230,8 @@ public class GameState {
             if(     isMoveLegal(move)
                     && move.isJump()
                     && getPiece(move.getInBetween()) != null
-                    && getPiece(move.getInBetween()).getColor() != turn){
+                    && getPiece(move.getInBetween()).getColor() != turn
+                    && getPiece(move.getCurrent()).isMoveLegal(this, move)){
                 return true;
             }
         }
@@ -244,6 +250,23 @@ public class GameState {
     }
 
     public boolean isGameOver(){
+        
+        ArrayList<Position> opponentPieces = getPiecePositions(turn.getOpponent());
+        
+        if(opponentPieces.isEmpty()){
+            return true;
+        }
+//        else {
+//            boolean noMoreMoves = true;
+//            for (Position position :
+//                    opponentPieces) {
+//                if(!getPossibleMoves(getPiece(position)).isEmpty()){
+//                    noMoreMoves = false;
+//                }
+//            }
+//            return noMoreMoves;
+//        }
+//
         return false;
     }
 

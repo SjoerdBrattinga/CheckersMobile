@@ -1,5 +1,7 @@
 package com.example.checkersmobile;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 public class GameController {
@@ -87,7 +89,6 @@ public class GameController {
                 selectedPiece = null;
                 endTurn();
             }
-
         }
     }
 
@@ -101,12 +102,19 @@ public class GameController {
     }
 
     public void endTurn(){
-        gameState.endTurn();
-        //ArrayList<Move> moves = gameState.getPossibleMoves();
-        possibleMoves = gameState.getPossibleMoves();
+        //gameState.printBoard();
 
-        activity.highlightTiles(getPiecePositions(possibleMoves), TileResource.GREEN);
-        activity.setCurrentPlayerText(getCurrentPlayer().toString());
+        if (gameState.isGameOver()){
+            Log.d(TAG, "endTurn: GameOver! Player " + getCurrentPlayer() + " Wins!");
+        } else {
+            gameState.endTurn();
+            //ArrayList<Move> moves = gameState.getPossibleMoves();
+            possibleMoves = gameState.getPossibleMoves();
+
+            activity.highlightTiles(getPiecePositions(possibleMoves), TileResource.GREEN);
+            activity.setCurrentPlayerText(getCurrentPlayer().toString());
+        }
+
     }
 
     private ArrayList<Position> getMoveDestinations(ArrayList<Move> moves) {

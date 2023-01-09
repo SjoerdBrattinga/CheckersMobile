@@ -16,15 +16,17 @@ public class Move {
         return destination;
     }
 
-    public int getCol1() {
+    private int getCol1() {
         return getCurrent().getCol();
     }
-    public int getRow1() {
+    private int getRow1() {
         return getCurrent().getRow();
     }
-    public int getCol2() {
+    private int getCol2() {
         return getDestination().getCol();
     }
+
+    //Used to check if a piece reaches the furthest row
     public int getRow2() {
         return getDestination().getRow();
     }
