@@ -4,6 +4,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.ArrayList;
 
@@ -15,12 +17,13 @@ public class GameState {
     private Color turn = Color.LIGHT;
     private Piece[][] board;
     private Move lastMove;
-
-    //private ArrayList<Move> possibleMoves;
+    private ArrayList<Piece> capturedPieces;
+    private ArrayList<Move> playerMoves;
 
     public GameState(){
         board = new Piece[boardSize][boardSize];
-        //possibleMoves = new ArrayList<>();
+        capturedPieces = new ArrayList<>();
+        playerMoves = new ArrayList<>();
         initBoard(board);
     }
 
@@ -36,7 +39,20 @@ public class GameState {
                 }
             }
         }
-        //printBoard(board);
+        testBoard();
+        //printBoard();
+    }
+
+    public void testBoard(){
+        this.board[4][1] = null;
+        this.board[2][5] = null;
+        this.board[2][1] = null;
+        this.board[0][7] = null;
+        this.board[3][2] = new Man(new Position(3,2), Color.DARK);
+        this.board[3][4] = new Man(new Position(3,4), Color.DARK);
+        this.board[5][2] = new Man(new Position(5,2), Color.DARK);
+        this.board[1][4] = null;
+        this.board[1][0] = null;
     }
 
     public void printBoard(){
@@ -104,14 +120,25 @@ public class GameState {
 
     public void movePiece(Move move){
         getPiece(move.getCurrent()).move(this, move);
+        playerMoves.add(move);
         lastMove = move;
+    }
+
+    public void addCapturedPiece(Piece piece) {
+        if (piece != null) {
+            //Piece copy = (Piece) piece.clone();
+            //capturedPieces.add(copy);
+
+            capturedPieces.add(piece);
+        }
+
     }
 
     public boolean isMoveLegal(Move move){
         return getPiece(move.getCurrent()).getColor() == getTurn()
                 && isOnBoard(move.getDestination())
                 && isOnBoard(move.getCurrent())
-                && getPiece(move.getDestination())  == null
+                && getPiece(move.getDestination()) == null
                 && getPiece(move.getCurrent()).isMoveLegal(this, move);
     }
 
@@ -174,6 +201,7 @@ public class GameState {
     }
 
     public ArrayList<Move> getPossibleMoves(Piece piece) {
+        //getPossibleMoves2();
         ArrayList<Move> possibleMoves = new ArrayList<>();
         Position current = piece.getPosition();
         Position[] destinations;
@@ -239,6 +267,92 @@ public class GameState {
         return false;
     }
 
+    public void getPossibleMoves2(){
+        Log.d(TAG, "getPossibleMoves2: ");
+        //ArrayList<Position> playerPiecePositions = getPiecePositions(turn);
+        ArrayList<Piece> playerPieces = getPieces(turn);
+        ArrayList<Move> jumpMoves = new ArrayList<>();
+
+        for (Piece piece : playerPieces) {
+            int jumps = getMaxJumps(new ArrayList<>(), piece.getPosition());
+            piece.setMaxJumps(jumps);
+            this.maxJumps = 0;
+        }
+
+    }
+
+    int maxJumps = 0;
+    public int getMaxJumps(ArrayList<Move> jumps, Position start) {
+        Piece piece = getPiece(start);
+        ArrayList<Move> possibleJumps = getPossibleJumps(start);
+
+        if(!possibleJumps.isEmpty()){
+//            if(!jumps.isEmpty()){
+//                //undoLastMove(jumps.get(jumps.size() - 1));
+//                //Move remove = jumps.remove(jumps.size() - 1);
+//                //undoLastMove(remove);
+//            }
+//        } else {
+            maxJumps++;
+           // jumps.addAll(possibleJumps);
+
+            for (Move move : possibleJumps) {
+                exploreJump(piece, move);
+                jumps.add(move);
+
+                getMaxJumps(jumps, move.getDestination());
+                undoLastMove(move);
+
+            }
+        }
+
+        return maxJumps;
+    }
+
+    private void exploreJump(Piece piece, Move move){
+        Log.d(TAG, "explore: move: " + move.toString());
+
+        if(move.isJump()){
+            setPiece(null, move.getCurrent());
+            setPiece(piece, move.getDestination());
+
+            Piece capturedPiece = getPiece(move.getInBetween());
+
+            if(capturedPiece != null){
+                addCapturedPiece(capturedPiece);
+            }
+            setPiece(null, move.getInBetween());
+        }
+    }
+
+    public void undoLastMove(Move move){
+        setPiece(getPiece(move.getDestination()), move.getCurrent());
+        setPiece(null, move.getDestination());
+
+        if(move.isJump() && !capturedPieces.isEmpty()){
+            Piece capturedPiece = capturedPieces.get(capturedPieces.size() - 1);
+            setPiece(capturedPiece, capturedPiece.getPosition());
+            capturedPieces.remove(capturedPiece);
+        }
+    }
+
+    public ArrayList<Move> getPossibleJumps(Position piecePosition) {
+        ArrayList<Move> possibleMoves = new ArrayList<>();
+
+        if(canJump(piecePosition)){
+            Position[] destinations = piecePosition.getDiagonal(2);;
+
+            for (Position destination : destinations) {
+
+                Move move = new Move(piecePosition, destination);
+
+                if (isMoveLegal(move) && getPiece(piecePosition).isMoveLegal(this, move)) {
+                    possibleMoves.add(move);
+                }
+            }
+        }
+        return possibleMoves;
+    }
 
     public boolean playerHasMoves(){
         return !getPossibleMoves().isEmpty();

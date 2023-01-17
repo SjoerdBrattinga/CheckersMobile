@@ -6,10 +6,12 @@ public abstract class Piece {
     private final String TAG = "Piece";
     private Position position;
     private final Color color;
+    private int maxJumps;
 
     public Piece(Position position, Color color) {
         this.position = position;
         this.color = color;
+        this.maxJumps = 0;
     }
 
     public Color getColor(){
@@ -22,6 +24,14 @@ public abstract class Piece {
 
     private void setPosition(Position position){
         this.position = position;
+    }
+
+    public int getMaxJumps() {
+        return maxJumps;
+    }
+
+    public void setMaxJumps(int maxJumps) {
+        this.maxJumps = maxJumps;
     }
 
     public void move(GameState game, Move move){
