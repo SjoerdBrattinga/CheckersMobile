@@ -108,6 +108,14 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         btnBoard[i][j].setImageResource(R.drawable.light_piece);
     }
 
+    public void drawDarkKing(int i, int j) {
+        btnBoard[i][j].setImageResource(R.drawable.dark_king);
+    }
+
+    public void drawLightKing(int i, int j) {
+        btnBoard[i][j].setImageResource(R.drawable.light_king);
+    }
+
     private void setToPositionText(Position selected){
         toPosTxt = findViewById(R.id.toView);
         if(selected == null){
