@@ -23,7 +23,6 @@ public class GameController {
         updateBoard();
 
         activity.setCurrentPlayerText(getCurrentPlayer().toString());
-        //ArrayList<Move> moves = gameState.getPossibleMoves();
         possibleMoves = gameState.getPossibleMoves();
         activity.highlightTiles(getPiecePositions(possibleMoves), TileResource.GREEN);
     }
@@ -34,9 +33,17 @@ public class GameController {
                 if(gameState.getPiece(i,j) == null){
                     activity.removePiece(i,j);
                 } else if(gameState.getPiece(i,j).getColor() == Color.LIGHT){
-                    activity.drawLightPiece(i,j);
+                    if (gameState.getPiece(i,j) instanceof King){
+                        activity.drawLightKing(i,j);
+                    } else {
+                        activity.drawLightPiece(i,j);
+                    }
                 } else if (gameState.getPiece(i,j).getColor() == Color.DARK){
-                    activity.drawDarkPiece(i,j);
+                    if (gameState.getPiece(i,j) instanceof King){
+                        activity.drawDarkKing(i,j);
+                    } else {
+                        activity.drawDarkPiece(i,j);
+                    }
                 }
             }
         }
