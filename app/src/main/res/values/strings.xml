@@ -2,4 +2,7 @@
     <string name="app_name">CheckersMobile</string>
     <string name="PlayersTurn">\'s turn</string>
     <string name="PlayerWins">&#160;wins!</string>
+    <string name="highScoreBtnTxt">High Scores</string>
+    <string name="playBtnTxt">Play</string>
+    <string name="checkersTxt">Checkers</string>
 </resources>

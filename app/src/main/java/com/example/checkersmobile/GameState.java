@@ -8,13 +8,11 @@ public class GameState {
     private final int boardSize = 8;
     private final int startingRows = 3;
     private Color currentPlayer = Color.LIGHT;
-    private Piece[][] board;
+    private final Piece[][] board;
     private Move lastMove;
-    private ArrayList<Move> playerMoves;
 
     public GameState(){
         board = new Piece[boardSize][boardSize];
-        playerMoves = new ArrayList<>();
         initBoard(board);
     }
     
@@ -201,12 +199,8 @@ public class GameState {
 
     public boolean isGameOver(){
         ArrayList<Position> opponentPieces = getPiecePositions(currentPlayer);
-        
-        if(opponentPieces.isEmpty() || getPossibleMoves(currentPlayer).isEmpty()){
-            return true;
-        }
 
-        return false;
+        return opponentPieces.isEmpty() || getPossibleMoves(currentPlayer).isEmpty();
     }
 
     //test functions

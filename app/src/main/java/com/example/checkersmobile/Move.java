@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 public class Move {
     private final Position current, destination;
-    private ArrayList<Move> successiveMoves = new ArrayList<>();
 
     public Move(Position start, Position destination) {
         this.current = start;
