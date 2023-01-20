@@ -17,15 +17,16 @@ public class GameState {
         playerMoves = new ArrayList<>();
         initBoard(board);
     }
+    
 
     private void initBoard(Piece[][] board){
-        for (int i = 0; i < boardSize; i++){
-            for (int j = 0; j < boardSize; j++){
-                if((i + j) % 2 == 1) {
-                    if (i < startingRows){
-                        board[i][j] = new Man(new Position(i,j), Color.DARK);
-                    } else if (i >= boardSize - startingRows ){
-                        board[i][j] = new Man(new Position(i,j), Color.LIGHT);
+        for (int row = 0; row < boardSize; row++){
+            for (int col = 0; col < boardSize; col++){
+                if((row + col) % 2 == 1) {
+                    if (row < startingRows){
+                        board[row][col] = new Man(new Position(row,col), Color.DARK);
+                    } else if (row >= boardSize - startingRows ){
+                        board[row][col] = new Man(new Position(row,col), Color.LIGHT);
                     }
                 }
             }
@@ -35,13 +36,13 @@ public class GameState {
 
     public ArrayList<Position> getPiecePositions(Color color){
         ArrayList<Position> piecePositions = new ArrayList<>();
-        for (int i = 0; i < boardSize; i++) {
-            for (int j = 0; j < boardSize; j++) {
-                if (board[i][j] == null) {
+        for (int row = 0; row < boardSize; row++) {
+            for (int col = 0; col < boardSize; col++) {
+                if (board[row][col] == null) {
                     continue;
                 }
-                if (board[i][j].getColor() == color){
-                    piecePositions.add(new Position(i,j));
+                if (board[row][col].getColor() == color){
+                    piecePositions.add(new Position(row,col));
                 }
             }
         }

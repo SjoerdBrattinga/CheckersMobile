@@ -28,21 +28,21 @@ public class GameController {
     }
 
     public void updateBoard(){
-        for (int i = 0; i < gameState.getBoardSize(); i++) {
-            for (int j = 0; j < gameState.getBoardSize(); j++) {
-                if(gameState.getPiece(i,j) == null){
-                    activity.removePiece(i,j);
-                } else if(gameState.getPiece(i,j).getColor() == Color.LIGHT){
-                    if (gameState.getPiece(i,j) instanceof King){
-                        activity.drawLightKing(i,j);
+        for (int row = 0; row < gameState.getBoardSize(); row++) {
+            for (int col = 0; col < gameState.getBoardSize(); col++) {
+                if(gameState.getPiece(row,col) == null){
+                    activity.removePiece(row,col);
+                } else if(gameState.getPiece(row,col).getColor() == Color.LIGHT){
+                    if (gameState.getPiece(row,col) instanceof King){
+                        activity.drawLightKing(row,col);
                     } else {
-                        activity.drawLightPiece(i,j);
+                        activity.drawLightPiece(row,col);
                     }
-                } else if (gameState.getPiece(i,j).getColor() == Color.DARK){
-                    if (gameState.getPiece(i,j) instanceof King){
-                        activity.drawDarkKing(i,j);
+                } else if (gameState.getPiece(row,col).getColor() == Color.DARK){
+                    if (gameState.getPiece(row,col) instanceof King){
+                        activity.drawDarkKing(row,col);
                     } else {
-                        activity.drawDarkPiece(i,j);
+                        activity.drawDarkPiece(row,col);
                     }
                 }
             }
