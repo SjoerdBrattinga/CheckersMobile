@@ -23,7 +23,7 @@ public class GameController {
         updateBoard();
 
         activity.setCurrentPlayerText(getCurrentPlayer().toString());
-        possibleMoves = gameState.getPossibleMoves();
+        possibleMoves = gameState.getPossibleMoves(gameState.getCurrentPlayer());
         activity.highlightTiles(getPiecePositions(possibleMoves), TileResource.GREEN);
     }
 
@@ -50,8 +50,6 @@ public class GameController {
     }
 
     public void handleInput(Position selected){
-        //activity.resetTileHighlights();
-
         if(gameState.isEmptyTile(selected)){
             if(selectedPiece != null){
                 onSelectTile(selected);
@@ -62,7 +60,7 @@ public class GameController {
     }
 
     private void onSelectPiece(Position selected){
-        if(gameState.getPiece(selected).getColor() == gameState.getTurn()){
+        if(gameState.getPiece(selected).getColor() == gameState.getCurrentPlayer()){
 
             if(selectedPiece == null){
                 if(getPiecePositions(possibleMoves).contains(selected)){
@@ -89,7 +87,7 @@ public class GameController {
 
             if(gameState.playerHasMoves()){
                 activity.highLightTile(selected, TileResource.GREEN);
-                possibleMoves = gameState.getPossibleMoves();
+                possibleMoves = gameState.getPossibleMoves(gameState.getCurrentPlayer());
                 onSelectPiece(selected);
 
             } else {
@@ -109,15 +107,14 @@ public class GameController {
     }
 
     public void endTurn(){
-        //gameState.printBoard();
+        gameState.endTurn();
 
         if (gameState.isGameOver()){
-            Log.d(TAG, "endTurn: GameOver! Player " + getCurrentPlayer() + " Wins!");
+            activity.setPlayerWinsText(getCurrentPlayer().getOpponent());
+            //open game over activity
         } else {
-            gameState.endTurn();
-            //ArrayList<Move> moves = gameState.getPossibleMoves();
-            possibleMoves = gameState.getPossibleMoves();
 
+            possibleMoves = gameState.getPossibleMoves(getCurrentPlayer());
             activity.highlightTiles(getPiecePositions(possibleMoves), TileResource.GREEN);
             activity.setCurrentPlayerText(getCurrentPlayer().toString());
         }
@@ -147,6 +144,6 @@ public class GameController {
     }
 
     public Color getCurrentPlayer(){
-        return gameState.getTurn();
+        return gameState.getCurrentPlayer();
     }
 }

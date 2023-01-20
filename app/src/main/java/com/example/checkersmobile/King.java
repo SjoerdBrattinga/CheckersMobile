@@ -1,9 +1,6 @@
 package com.example.checkersmobile;
 
-import java.util.ArrayList;
-
 public class King extends Piece{
-    private ArrayList<Position> captureMoves;
 
     public King(Position position, Color color) {
         super(position, color);

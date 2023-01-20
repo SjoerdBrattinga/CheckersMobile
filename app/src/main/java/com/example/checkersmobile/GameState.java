@@ -2,10 +2,6 @@ package com.example.checkersmobile;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.ArrayList;
 
@@ -14,7 +10,7 @@ public class GameState {
     private final String TAG = "GameState";
     private final int boardSize = 8;
     private final int startingRows = 3;
-    private Color turn = Color.LIGHT;
+    private Color currentPlayer = Color.LIGHT;
     private Piece[][] board;
     private Move lastMove;
     private ArrayList<Piece> capturedPieces;
@@ -47,7 +43,21 @@ public class GameState {
         this.board[4][1] = null;
         this.board[2][5] = null;
         this.board[2][1] = null;
+        this.board[0][3] = null;
+        this.board[1][4] = new Man(new Position(1,4), Color.DARK);
         this.board[0][7] = null;
+        this.board[3][2] = new Man(new Position(3,2), Color.DARK);
+        this.board[3][4] = new Man(new Position(3,4), Color.DARK);
+        this.board[5][2] = new Man(new Position(5,2), Color.DARK);
+        this.board[1][4] = null;
+        this.board[1][0] = null;
+    }
+
+    public void testBoard2(){
+        this.board[4][1] = null;
+        this.board[2][5] = null;
+        this.board[2][1] = null;
+        this.board[0][3] = null;
         this.board[3][2] = new Man(new Position(3,2), Color.DARK);
         this.board[3][4] = new Man(new Position(3,4), Color.DARK);
         this.board[5][2] = new Man(new Position(5,2), Color.DARK);
@@ -135,7 +145,7 @@ public class GameState {
     }
 
     public boolean isMoveLegal(Move move){
-        return getPiece(move.getCurrent()).getColor() == getTurn()
+        return getPiece(move.getCurrent()).getColor() == getCurrentPlayer()
                 && isOnBoard(move.getDestination())
                 && isOnBoard(move.getCurrent())
                 && getPiece(move.getDestination()) == null
@@ -156,8 +166,8 @@ public class GameState {
         return true;
     }
 
-    public Color getTurn() {
-        return turn;
+    public Color getCurrentPlayer() {
+        return currentPlayer;
     }
 
     public Piece getPiece(int row, int col){
@@ -176,12 +186,12 @@ public class GameState {
         return boardSize;
     }
 
-    public ArrayList<Move> getPossibleMoves() {
+    public ArrayList<Move> getPossibleMoves(Color player) {
 
         ArrayList<Move> possibleMoves = new ArrayList<>();
 
         if (lastMove == null) {
-            ArrayList<Position> piecePositions = getPiecePositions(turn);
+            ArrayList<Position> piecePositions = getPiecePositions(player);
 
             if (hasJumps(piecePositions)) {
                 for (Position position : piecePositions) {
@@ -258,7 +268,7 @@ public class GameState {
             if(     isMoveLegal(move)
                     && move.isJump()
                     && getPiece(move.getInBetween()) != null
-                    && getPiece(move.getInBetween()).getColor() != turn
+                    && getPiece(move.getInBetween()).getColor() != currentPlayer
                     && getPiece(move.getCurrent()).isMoveLegal(this, move)){
                 return true;
             }
@@ -267,41 +277,63 @@ public class GameState {
         return false;
     }
 
-    public void getPossibleMoves2(){
+    public ArrayList<Move> getPossibleMoves2(){
         Log.d(TAG, "getPossibleMoves2: ");
         //ArrayList<Position> playerPiecePositions = getPiecePositions(turn);
-        ArrayList<Piece> playerPieces = getPieces(turn);
-        ArrayList<Move> jumpMoves = new ArrayList<>();
-
+        ArrayList<Piece> playerPieces = getPieces(currentPlayer);
+        ArrayList<Move> possibleMoves = new ArrayList<>();
+        getMaxJumps2(new ArrayList<>(), getPiece(6,1).getPosition());
         for (Piece piece : playerPieces) {
-            int jumps = getMaxJumps(new ArrayList<>(), piece.getPosition());
+            int jumps = getMaxJumps(piece, piece.getPosition());
             piece.setMaxJumps(jumps);
             this.maxJumps = 0;
         }
-
+        return possibleMoves;
     }
 
     int maxJumps = 0;
-    public int getMaxJumps(ArrayList<Move> jumps, Position start) {
+    public int getMaxJumps(Piece piece, Position start) {
+        //Piece piece = getPiece(start);
+        ArrayList<Move> possibleJumps = getPossibleJumps(start);
+
+        if(!possibleJumps.isEmpty()){
+            maxJumps++;
+
+            for (Move move : possibleJumps) {
+                exploreJump(piece, move);
+
+                getMaxJumps(piece, move.getDestination());
+                undoLastMove(move);
+            }
+        }
+
+        return maxJumps;
+    }
+
+    public int getMaxJumps2(ArrayList<Move> jumpsSoFar, Position start) {
         Piece piece = getPiece(start);
         ArrayList<Move> possibleJumps = getPossibleJumps(start);
 
         if(!possibleJumps.isEmpty()){
-//            if(!jumps.isEmpty()){
-//                //undoLastMove(jumps.get(jumps.size() - 1));
-//                //Move remove = jumps.remove(jumps.size() - 1);
-//                //undoLastMove(remove);
-//            }
-//        } else {
             maxJumps++;
-           // jumps.addAll(possibleJumps);
+            //jumpsSoFar.addAll(possibleJumps);
 
             for (Move move : possibleJumps) {
                 exploreJump(piece, move);
-                jumps.add(move);
-
-                getMaxJumps(jumps, move.getDestination());
+                if(!jumpsSoFar.contains(move)){
+                    jumpsSoFar.add(move);
+                }
+                getMaxJumps2(jumpsSoFar, move.getDestination());
                 undoLastMove(move);
+            }
+        } else {
+            if(!jumpsSoFar.isEmpty()){
+                if (jumpsSoFar.size() > piece.getPossibleMoves().size()){
+                    piece.setPossibleMoves((ArrayList<Move>) jumpsSoFar.clone());
+                    jumpsSoFar.remove(jumpsSoFar.size() - 1);
+                } else {
+                    jumpsSoFar.remove(jumpsSoFar.size() - 1);
+                }
 
             }
         }
@@ -355,32 +387,21 @@ public class GameState {
     }
 
     public boolean playerHasMoves(){
-        return !getPossibleMoves().isEmpty();
+        return !getPossibleMoves(currentPlayer).isEmpty();
     }
 
     public void endTurn(){
         lastMove = null;
-        turn = turn.getOpponent();
+        currentPlayer = currentPlayer.getOpponent();
     }
 
     public boolean isGameOver(){
+        ArrayList<Position> opponentPieces = getPiecePositions(currentPlayer);
         
-        ArrayList<Position> opponentPieces = getPiecePositions(turn.getOpponent());
-        
-        if(opponentPieces.isEmpty()){
+        if(opponentPieces.isEmpty() || getPossibleMoves(currentPlayer).isEmpty()){
             return true;
         }
-//        else {
-//            boolean noMoreMoves = true;
-//            for (Position position :
-//                    opponentPieces) {
-//                if(!getPossibleMoves(getPiece(position)).isEmpty()){
-//                    noMoreMoves = false;
-//                }
-//            }
-//            return noMoreMoves;
-//        }
-//
+
         return false;
     }
 

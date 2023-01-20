@@ -1,17 +1,19 @@
 package com.example.checkersmobile;
 
-import android.util.Log;
+import java.util.ArrayList;
 
-public abstract class Piece {
+public abstract class Piece implements Cloneable{
     private final String TAG = "Piece";
     private Position position;
     private final Color color;
     private int maxJumps;
+    private ArrayList<Move> possibleMoves;
 
     public Piece(Position position, Color color) {
         this.position = position;
         this.color = color;
         this.maxJumps = 0;
+        this.possibleMoves = new ArrayList<>();
     }
 
     public Color getColor(){
@@ -51,5 +53,22 @@ public abstract class Piece {
                 || ( move.distance() == 2
                 && gameState.getPiece(move.getInBetween()) != null
                 && gameState.getPiece(move.getInBetween()).getColor() == this.getColor().getOpponent()));
+    }
+
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public ArrayList<Move> getPossibleMoves() {
+        return possibleMoves;
+    }
+
+    public void setPossibleMoves(ArrayList<Move> possibleMoves) {
+        this.possibleMoves = possibleMoves;
     }
 }

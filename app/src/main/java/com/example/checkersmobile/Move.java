@@ -2,8 +2,11 @@ package com.example.checkersmobile;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
+
 public class Move {
     private final Position current, destination;
+    private ArrayList<Move> successiveMoves = new ArrayList<>();
 
     public Move(Position start, Position destination) {
         this.current = start;
@@ -14,6 +17,18 @@ public class Move {
     }
     public Position getDestination() {
         return destination;
+    }
+
+    public void addSuccessiveMove(Move move){
+        this.successiveMoves.add(move);
+    }
+
+    public void setSuccessiveMove(ArrayList<Move> successiveMoves){
+        this.successiveMoves = successiveMoves;
+    }
+
+    public ArrayList<Move> getSuccessiveMoves(){
+        return this.successiveMoves;
     }
 
     private int getCol1() {

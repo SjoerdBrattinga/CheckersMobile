@@ -2,9 +2,14 @@ package com.example.checkersmobile;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Point;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
+//import android.widget.LinearLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -12,7 +17,7 @@ import java.util.ArrayList;
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener{
     private final String TAG = "BoardActivity";
 
-    private TextView currentPlayerTxt, fromPosTxt, toPosTxt;
+    private TextView gameInfoTxt, fromPosTxt, toPosTxt;
     private ImageButton[][] btnBoard;
     private ArrayList<Position> highlightedTiles;
     private Position highLightedPiece;
@@ -22,8 +27,31 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_board);
+
         highlightedTiles = new ArrayList<>();
         controller = new GameController(new GameState(), this);
+        resizeBoard();
+    }
+
+    private void resizeBoard(){
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        try {
+            display.getRealSize(size);
+        } catch (NoSuchMethodError err) {
+            display.getSize(size);
+        }
+        int width = size.x;
+        int height = width;
+
+        LinearLayout layout = findViewById(R.id.board);
+        ViewGroup.LayoutParams params = layout.getLayoutParams();
+        params.width = width;
+        params.height = height;
+
+//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams((int)(width ),(int)(height)); // or set height to any fixed value you want
+//
+//        findViewById(R.id.board).setLayoutParams(lp);
     }
 
     public void drawBoard(int rows, int columns){
@@ -53,9 +81,9 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         controller.handleInput(new Position(row,col));
     }
 
-    public void setCurrentPlayerText(String player){
-        currentPlayerTxt = findViewById(R.id.playerView);
-        currentPlayerTxt.setText(String.format("%s%s", player, getString(R.string.PlayersTurn)));
+    public void setCurrentPlayerText(String currentPlayer){
+        gameInfoTxt = findViewById(R.id.gameInfoTxtView);
+        gameInfoTxt.setText(String.format("%s%s", currentPlayer, getString(R.string.PlayersTurn)));
     }
 
     public void highlightTiles(ArrayList<Position> tiles, TileResource color){
@@ -87,7 +115,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void drawDarkTile(int i, int j){
-        btnBoard[i][j].setBackgroundResource(R.drawable.dark_tile);
+        btnBoard[i][j].setBackgroundResource(TileResource.DARK.drawableId);
         btnBoard[i][j].setOnClickListener(this);
         btnBoard[i][j].setTag(i + "-" + j);
     }
@@ -133,5 +161,10 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         } else {
             fromPosTxt.setText("From: row: " + selected.getRow() + " col: " + selected.getCol());
         }
+    }
+
+    public void setPlayerWinsText(Color player) {
+        gameInfoTxt = findViewById(R.id.gameInfoTxtView);
+        gameInfoTxt.setText(player + getString(R.string.PlayerWins));
     }
 }
