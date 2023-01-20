@@ -10,9 +10,9 @@ public class Man extends Piece{
     public void move(GameState gameState, Move move) {
         super.move(gameState, move);
 
-        int destinationRow = getColor() == Color.LIGHT ? 0 : 7;
+        int backRow = getColor() == Color.LIGHT ? 0 : 7;
 
-        if (move.getRow2() == destinationRow){
+        if (move.getRow2() == backRow){
             makeKing(gameState);
         }
     }

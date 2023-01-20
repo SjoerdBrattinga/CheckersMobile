@@ -9,9 +9,9 @@ public enum TileResource {
     BLUE(R.drawable.blue_tile),
     RED(R.drawable.red_tile);
 
-    public final int drawableId;
+    public final int resourceId;
 
-    TileResource(int drawableId) {
-        this.drawableId = drawableId;
+    TileResource(int resourceId) {
+        this.resourceId = resourceId;
     }
 }

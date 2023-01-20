@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener{
     private final String TAG = "BoardActivity";
 
-    private TextView gameInfoTxt, fromPosTxt, toPosTxt;
+    private TextView gameInfoTxt;
     private ImageButton[][] btnBoard;
     private ArrayList<Position> highlightedTiles;
     private Position highLightedPiece;
@@ -48,10 +48,6 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         ViewGroup.LayoutParams params = layout.getLayoutParams();
         params.width = width;
         params.height = height;
-
-//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams((int)(width ),(int)(height)); // or set height to any fixed value you want
-//
-//        findViewById(R.id.board).setLayoutParams(lp);
     }
 
     public void drawBoard(int rows, int columns){
@@ -90,7 +86,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         setHighlightedTiles(tiles);
         for (int i = 0; i < tiles.size(); i++) {
             btnBoard[tiles.get(i).getRow()][tiles.get(i).getCol()]
-                    .setBackgroundResource(color.drawableId);
+                    .setBackgroundResource(color.resourceId);
         }
     }
 
@@ -107,15 +103,15 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 
     public void highLightTile(Position position, TileResource color){
         highLightedPiece = position;
-        btnBoard[position.getRow()][position.getCol()].setBackgroundResource(color.drawableId);
+        btnBoard[position.getRow()][position.getCol()].setBackgroundResource(color.resourceId);
     }
 
     private void drawLightTile(int i, int j){
-        btnBoard[i][j].setBackgroundResource(TileResource.LIGHT.drawableId);
+        btnBoard[i][j].setBackgroundResource(TileResource.LIGHT.resourceId);
     }
 
     private void drawDarkTile(int i, int j){
-        btnBoard[i][j].setBackgroundResource(TileResource.DARK.drawableId);
+        btnBoard[i][j].setBackgroundResource(TileResource.DARK.resourceId);
         btnBoard[i][j].setOnClickListener(this);
         btnBoard[i][j].setTag(i + "-" + j);
     }
@@ -144,27 +140,8 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         btnBoard[i][j].setImageResource(R.drawable.light_king);
     }
 
-    private void setToPositionText(Position selected){
-        toPosTxt = findViewById(R.id.toView);
-        if(selected == null){
-            toPosTxt.setText("To: Select a position");
-        } else {
-            toPosTxt.setText("To: row: " + selected.getRow() + " col: " + selected.getCol());
-        }
-    }
-
-    private void setFromPositionText(Position selected){
-        fromPosTxt = findViewById(R.id.fromView);
-
-        if(selected == null){
-            fromPosTxt.setText("From: Select a position");
-        } else {
-            fromPosTxt.setText("From: row: " + selected.getRow() + " col: " + selected.getCol());
-        }
-    }
-
     public void setPlayerWinsText(Color player) {
         gameInfoTxt = findViewById(R.id.gameInfoTxtView);
-        gameInfoTxt.setText(player + getString(R.string.PlayerWins));
+        gameInfoTxt.setText(String.format("%s%s", player, getString(R.string.PlayerWins)));
     }
 }

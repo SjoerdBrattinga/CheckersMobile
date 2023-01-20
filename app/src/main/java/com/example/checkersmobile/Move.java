@@ -19,18 +19,6 @@ public class Move {
         return destination;
     }
 
-    public void addSuccessiveMove(Move move){
-        this.successiveMoves.add(move);
-    }
-
-    public void setSuccessiveMove(ArrayList<Move> successiveMoves){
-        this.successiveMoves = successiveMoves;
-    }
-
-    public ArrayList<Move> getSuccessiveMoves(){
-        return this.successiveMoves;
-    }
-
     private int getCol1() {
         return getCurrent().getCol();
     }
@@ -40,8 +28,7 @@ public class Move {
     private int getCol2() {
         return getDestination().getCol();
     }
-
-    //Used to check if a piece reaches the furthest row
+    //Used to check if a piece reaches the back row
     public int getRow2() {
         return getDestination().getRow();
     }
