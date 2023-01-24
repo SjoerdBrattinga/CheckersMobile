@@ -11,6 +11,22 @@ public class Position {
         this.col = col;
     }
 
+    private Position getUpLeft(int distance){
+        return new Position(row - distance, col - distance);
+    }
+
+    private Position getUpRight(int distance){
+        return new Position(row - distance, col + distance);
+    }
+
+    private Position getDownLeft(int distance){
+        return new Position(row + distance, col - distance);
+    }
+
+    private Position getDownRight(int distance){
+        return new Position(row + distance, col + distance);
+    }
+
     public int getRow() {
         return row;
     }
@@ -26,22 +42,6 @@ public class Position {
                 getDownLeft(distance),
                 getDownRight(distance)
         };
-    }
-
-    public Position getUpLeft(int distance){
-        return new Position(row - distance, col - distance);
-    }
-
-    public Position getUpRight(int distance){
-        return new Position(row - distance, col + distance);
-    }
-
-    public Position getDownLeft(int distance){
-        return new Position(row + distance, col - distance);
-    }
-
-    public Position getDownRight(int distance){
-        return new Position(row + distance, col + distance);
     }
 
     @Override

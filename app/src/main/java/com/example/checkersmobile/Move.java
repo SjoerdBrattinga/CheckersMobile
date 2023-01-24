@@ -37,6 +37,7 @@ public class Move {
     public boolean isDown() {
         return getRow2() - getRow1() > 0;
     }
+
     public boolean isDiagonal() {
         return Math.abs(getRow2() - getRow1()) == Math.abs(getCol2() - getCol1());
     }

@@ -21,11 +21,11 @@ public class Man extends Piece{
     public boolean isMoveLegal(GameState gameState, Move move) {
         return super.isMoveLegal(gameState, move)
                 && ( (getColor() == Color.LIGHT && move.isUp())
-                || (getColor() == Color.DARK && move.isDown()) );
+                || (getColor() == Color.DARK && move.isDown()));
     }
 
     private void makeKing(GameState gameState){
         //TODO: end turn
-        gameState.setPiece(new King(this.getPosition(),this.getColor()), this.getPosition());
+        gameState.setPiece(new King(getPosition(),getColor()), getPosition());
     }
 }

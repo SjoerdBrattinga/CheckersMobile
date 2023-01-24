@@ -36,7 +36,7 @@ public class GameState {
                 }
             }
         }
-        //testBoard2();
+        testBoard();
     }
 
     public ArrayList<Position> getPiecePositions(Color color){
@@ -121,7 +121,7 @@ public class GameState {
 
             if(possibleMoves.isEmpty()){
                 for (Position position : piecePositions) {
-                    possibleMoves.addAll(getPossibleMoves(getPiece(position)));
+                    possibleMoves.addAll(getPossibleMoves(position));
                 }
             }
 
@@ -150,19 +150,18 @@ public class GameState {
         return possibleMoves;
     }
 
-    public ArrayList<Move> getPossibleMoves(Piece piece) {
+    public ArrayList<Move> getPossibleMoves(Position piecePosition) {
         ArrayList<Move> possibleMoves = new ArrayList<>();
-        Position current = piece.getPosition();
         Position[] destinations;
 
-        if(canJump(current)){
-            destinations = piece.getPosition().getDiagonal(2);
+        if(canJump(piecePosition)){
+            destinations = piecePosition.getDiagonal(2);
         } else {
-            destinations = piece.getPosition().getDiagonal(1);
+            destinations = piecePosition.getDiagonal(1);
         }
 
         for (Position destination : destinations) {
-            Move move = new Move(current, destination);
+            Move move = new Move(piecePosition, destination);
 
             if(isMoveLegal(move)) {
                 possibleMoves.add(move);
@@ -177,11 +176,11 @@ public class GameState {
 
         for (Position destination : destinations) {
             Move move = new Move(position, destination);
-            if(     isMoveLegal(move)
+
+            if (isMoveLegal(move)
                     && move.isJump()
-                    && getPiece(move.getInBetween()) != null
-                    && getPiece(move.getInBetween()).getColor() != currentPlayer
-                    && getPiece(move.getCurrent()).isMoveLegal(this, move)){
+                    && (getPiece(move.getInBetween()) != null)
+                    && (getPiece(move.getInBetween()).getColor() != currentPlayer)) {
                 return true;
             }
         }
@@ -314,19 +313,20 @@ public class GameState {
 //        return possibleMoves;
 //    }
 //
-//    public void testBoard(){
-//        this.board[4][1] = null;
-//        this.board[2][5] = null;
-//        this.board[2][1] = null;
-//        this.board[0][3] = null;
-//        this.board[1][4] = new Man(new Position(1,4), Color.DARK);
-//        this.board[0][7] = null;
-//        this.board[3][2] = new Man(new Position(3,2), Color.DARK);
-//        this.board[3][4] = new Man(new Position(3,4), Color.DARK);
-//        this.board[5][2] = new Man(new Position(5,2), Color.DARK);
-//        this.board[1][4] = null;
-//        this.board[1][0] = null;
-//    }
+    public void testBoard(){
+        this.board[4][1] = null;
+        this.board[2][5] = null;
+        this.board[2][1] = null;
+        this.board[0][3] = null;
+        this.board[0][5] = null;
+        this.board[1][4] = new Man(new Position(1,4), Color.DARK);
+        this.board[0][7] = null;
+        this.board[3][2] = new Man(new Position(3,2), Color.DARK);
+        this.board[3][4] = new Man(new Position(3,4), Color.DARK);
+        this.board[5][2] = new Man(new Position(5,2), Color.DARK);
+        //this.board[1][4] = null;
+        this.board[1][0] = null;
+    }
 //
     public void testBoard2(){
         this.board[4][1] = null;

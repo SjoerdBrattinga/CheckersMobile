@@ -1,13 +1,16 @@
 package com.example.checkersmobile;
 
 public abstract class Piece {
-    private final String TAG = "Piece";
-    private Position position;
     private final Color color;
+    private Position position;
 
     public Piece(Position position, Color color) {
         this.position = position;
         this.color = color;
+    }
+
+    private void setPosition(Position position){
+        this.position = position;
     }
 
     public Color getColor(){
@@ -18,25 +21,24 @@ public abstract class Piece {
         return position;
     }
 
-    private void setPosition(Position position){
-        this.position = position;
-    }
-
-    public void move(GameState game, Move move){
-        game.setPiece(null, position);
+    public void move(GameState gameState, Move move){
+        //Remove piece at current position
+        gameState.setPiece(null, position);
+        //update piece position
         setPosition(move.getDestination());
-        game.setPiece(this, position);
+        //place piece at move destination
+        gameState.setPiece(this, position);
 
         if(move.isJump()){
-            game.setPiece(null, move.getInBetween());
+            //Remove captured piece
+            gameState.setPiece(null, move.getInBetween());
         }
     }
 
     public boolean isMoveLegal(GameState gameState, Move move){
         return move.isDiagonal()
-                && gameState.getPiece(move.getDestination()) == null
-                && ( move.distance() == 1
-                || ( move.distance() == 2
+                && ( move.distance() == 1 //regular move
+                || ( move.distance() == 2 //jump
                 && gameState.getPiece(move.getInBetween()) != null
                 && gameState.getPiece(move.getInBetween()).getColor() == this.getColor().getOpponent()));
     }
