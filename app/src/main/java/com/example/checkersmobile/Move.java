@@ -18,16 +18,15 @@ public class Move {
         return destination;
     }
 
-    private int getCol1() {
+    public int getCol1() {
         return getCurrent().getCol();
     }
-    private int getRow1() {
+    public int getRow1() {
         return getCurrent().getRow();
     }
-    private int getCol2() {
+    public int getCol2() {
         return getDestination().getCol();
     }
-    //Used to check if a piece reaches the back row
     public int getRow2() {
         return getDestination().getRow();
     }

@@ -64,24 +64,27 @@ public class GameState {
     }
 
     public boolean isMoveLegal(Move move){
-        return getPiece(move.getCurrent()).getColor() == getCurrentPlayer()
-                && isValidPosition(move.getDestination())
-                && isValidPosition(move.getCurrent())
+        Piece piece = getPiece(move.getCurrent());
+
+        return piece.getColor() == getCurrentPlayer()
+                && isMoveWithinBoardBounds(move)
                 && getPiece(move.getDestination()) == null
-                && getPiece(move.getCurrent()).isMoveLegal(this, move);
+                && piece.isMoveLegal(this, move);
     }
 
-    public boolean isValidPosition(Position position){
-        int[] coordinates = {
-                position.getRow(),
-                position.getCol()
+    private boolean isMoveWithinBoardBounds(Move move){
+        int[] coordinates = new int[]{
+                move.getCol1(),
+                move.getRow1(),
+                move.getCol2(),
+                move.getRow2()
         };
 
-        for(int value : coordinates){
-            if(value < 0 || value >= boardSize){
+        for (int coordinate : coordinates)
+            if(coordinate < 0 || coordinate >= getBoardSize()){
                 return false;
             }
-        }
+
         return true;
     }
 
@@ -139,7 +142,7 @@ public class GameState {
 
                 Move move = new Move(piecePosition, destination);
 
-                if (isMoveLegal(move) && getPiece(piecePosition).isMoveLegal(this, move)) {
+                if(isMoveLegal(move)) {
                     possibleMoves.add(move);
                 }
             }
@@ -160,7 +163,8 @@ public class GameState {
 
         for (Position destination : destinations) {
             Move move = new Move(current, destination);
-            if (isMoveLegal(move) && piece.isMoveLegal(this, move)) {
+
+            if(isMoveLegal(move)) {
                 possibleMoves.add(move);
             }
         }
