@@ -17,13 +17,15 @@ public class Man extends Piece{
         }
     }
 
-    @Override public boolean    isMoveLegal(GameState gameState, Move move) {
+    @Override
+    public boolean isMoveLegal(GameState gameState, Move move) {
         return super.isMoveLegal(gameState, move)
                 && ( (getColor() == Color.LIGHT && move.isUp())
                 || (getColor() == Color.DARK && move.isDown()) );
     }
 
-    public void makeKing(GameState gameState){
+    private void makeKing(GameState gameState){
+        //TODO: end turn
         gameState.setPiece(new King(this.getPosition(),this.getColor()), this.getPosition());
     }
 }

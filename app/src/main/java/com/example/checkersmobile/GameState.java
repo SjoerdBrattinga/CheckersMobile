@@ -14,8 +14,15 @@ public class GameState {
     public GameState(){
         board = new Piece[boardSize][boardSize];
         initBoard(board);
+        //initTestBoard();
     }
-    
+
+    private void initTestBoard(){
+        board[3][4] = new King(new Position(3,4), Color.DARK);
+        board[3][6] = new King(new Position(3,6), Color.DARK);
+        board[5][4] = new King(new Position(5,4), Color.LIGHT);
+        board[5][6] = new King(new Position(5,6), Color.LIGHT);
+    }
 
     private void initBoard(Piece[][] board){
         for (int row = 0; row < boardSize; row++){
@@ -29,7 +36,7 @@ public class GameState {
                 }
             }
         }
-        //testBoard();
+        //testBoard2();
     }
 
     public ArrayList<Position> getPiecePositions(Color color){
@@ -58,13 +65,13 @@ public class GameState {
 
     public boolean isMoveLegal(Move move){
         return getPiece(move.getCurrent()).getColor() == getCurrentPlayer()
-                && isOnBoard(move.getDestination())
-                && isOnBoard(move.getCurrent())
+                && isValidPosition(move.getDestination())
+                && isValidPosition(move.getCurrent())
                 && getPiece(move.getDestination()) == null
                 && getPiece(move.getCurrent()).isMoveLegal(this, move);
     }
 
-    public boolean isOnBoard(Position position){
+    public boolean isValidPosition(Position position){
         int[] coordinates = {
                 position.getRow(),
                 position.getCol()
@@ -105,20 +112,38 @@ public class GameState {
         if (lastMove == null) {
             ArrayList<Position> piecePositions = getPiecePositions(player);
 
-            if (hasJumps(piecePositions)) {
+            for (Position position : piecePositions) {
+                possibleMoves.addAll(getPossibleJumps(position));
+            }
+
+            if(possibleMoves.isEmpty()){
                 for (Position position : piecePositions) {
-                    ArrayList<Move> test = getPossibleMoves(position, true);
-                    possibleMoves.addAll(test);
-                }
-            } else {
-                for (Position position : piecePositions) {
-                    possibleMoves.addAll(getPossibleMoves(position, false));
+                    possibleMoves.addAll(getPossibleMoves(getPiece(position)));
                 }
             }
+
         } else if (lastMove.isJump()){
-            possibleMoves.addAll(getPossibleMoves(lastMove.getDestination(), true));
+            possibleMoves.addAll(getPossibleJumps(lastMove.getDestination()));
         }
 
+        return possibleMoves;
+    }
+
+    public ArrayList<Move> getPossibleJumps(Position piecePosition) {
+        ArrayList<Move> possibleMoves = new ArrayList<>();
+
+        if(canJump(piecePosition)){
+            Position[] destinations = piecePosition.getDiagonal(2);
+
+            for (Position destination : destinations) {
+
+                Move move = new Move(piecePosition, destination);
+
+                if (isMoveLegal(move) && getPiece(piecePosition).isMoveLegal(this, move)) {
+                    possibleMoves.add(move);
+                }
+            }
+        }
         return possibleMoves;
     }
 
@@ -143,37 +168,9 @@ public class GameState {
         return possibleMoves;
     }
 
-    private ArrayList<Move> getPossibleMoves(Position piecePosition, boolean jump) {
-        ArrayList<Move> possibleMoves = new ArrayList<>();
-        Position[] destinations;
-
-        if(jump){
-            destinations = piecePosition.getDiagonal(2);
-
-        } else {
-            destinations = piecePosition.getDiagonal(1);
-        }
-
-        for (Position destination : destinations) {
-            Move move = new Move(piecePosition, destination);
-            if (isMoveLegal(move) && getPiece(piecePosition).isMoveLegal(this, move)) {
-                possibleMoves.add(move);
-            }
-        }
-
-        return possibleMoves;
-    }
-
-    private boolean hasJumps(ArrayList<Position> piecePositions){
-        for (Position piece : piecePositions) {
-            if (canJump(piece)) return true;
-        }
-
-        return false;
-    }
-
     public boolean canJump(Position position){
         Position[] destinations = position.getDiagonal(2);
+
         for (Position destination : destinations) {
             Move move = new Move(position, destination);
             if(     isMoveLegal(move)
@@ -327,17 +324,17 @@ public class GameState {
 //        this.board[1][0] = null;
 //    }
 //
-//    public void testBoard2(){
-//        this.board[4][1] = null;
-//        this.board[2][5] = null;
-//        this.board[2][1] = null;
-//        this.board[0][3] = null;
-//        this.board[3][2] = new Man(new Position(3,2), Color.DARK);
-//        this.board[3][4] = new Man(new Position(3,4), Color.DARK);
-//        this.board[5][2] = new Man(new Position(5,2), Color.DARK);
-//        this.board[1][4] = null;
-//        this.board[1][0] = null;
-//    }
+    public void testBoard2(){
+        this.board[4][1] = null;
+        this.board[2][5] = null;
+        this.board[2][1] = null;
+        this.board[0][3] = null;
+        this.board[3][2] = new Man(new Position(3,2), Color.DARK);
+        this.board[3][4] = new Man(new Position(3,4), Color.DARK);
+        this.board[5][2] = new Man(new Position(5,2), Color.DARK);
+        this.board[1][4] = null;
+        this.board[1][0] = null;
+    }
 //
 //    public void printBoard(){
 //        String[][] boardStrArr = new String[8][8];
@@ -357,5 +354,34 @@ public class GameState {
 //                }
 //            }
 //        }
+//    }
+
+//    private ArrayList<Move> getPossibleMoves(Position piecePosition, boolean jump) {
+//        ArrayList<Move> possibleMoves = new ArrayList<>();
+//        Position[] destinations;
+//
+//        if(jump){
+//            destinations = piecePosition.getDiagonal(2);
+//
+//        } else {
+//            destinations = piecePosition.getDiagonal(1);
+//        }
+//
+//        for (Position destination : destinations) {
+//            Move move = new Move(piecePosition, destination);
+//            if (isMoveLegal(move) && getPiece(piecePosition).isMoveLegal(this, move)) {
+//                possibleMoves.add(move);
+//            }
+//        }
+//
+//        return possibleMoves;
+//    }
+//
+//    private boolean hasJumps(ArrayList<Position> piecePositions){
+//        for (Position piece : piecePositions) {
+//            if (canJump(piece)) return true;
+//        }
+//
+//        return false;
 //    }
 }
