@@ -15,8 +15,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener{
-    private final String TAG = "BoardActivity";
-
     private TextView gameInfoTxt;
     private ImageButton[][] btnBoard;
     private ArrayList<Position> highlightedTiles;
@@ -104,20 +102,20 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         btnBoard[row][col].setImageResource(0);
     }
 
-    public void drawDarkPiece(int row, int col) {
-        btnBoard[row][col].setImageResource(R.drawable.dark_piece);
+    public void drawMan(int row, int col, Color color){
+        if(color == Color.DARK){
+            btnBoard[row][col].setImageResource(R.drawable.dark_piece);
+        } else if(color == Color.LIGHT){
+            btnBoard[row][col].setImageResource(R.drawable.light_piece);
+        }
     }
 
-    public void drawLightPiece(int row, int col) {
-        btnBoard[row][col].setImageResource(R.drawable.light_piece);
-    }
-
-    public void drawDarkKing(int row, int col) {
-        btnBoard[row][col].setImageResource(R.drawable.dark_king);
-    }
-
-    public void drawLightKing(int row, int col) {
-        btnBoard[row][col].setImageResource(R.drawable.light_king);
+    public void drawKing(int row, int col, Color color){
+        if(color == Color.DARK){
+            btnBoard[row][col].setImageResource(R.drawable.dark_king);
+        } else if(color == Color.LIGHT){
+            btnBoard[row][col].setImageResource(R.drawable.light_king);
+        }
     }
 
     public void setPlayerWinsText(Color player) {
