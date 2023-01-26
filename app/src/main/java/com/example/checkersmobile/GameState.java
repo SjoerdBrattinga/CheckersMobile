@@ -10,6 +10,7 @@ public class GameState {
     private Color currentPlayer = Color.LIGHT;
     private final Piece[][] board;
     private Move lastMove;
+    private boolean pieceCrowned;
 
     public GameState(){
         board = new Piece[boardSize][boardSize];
@@ -41,16 +42,16 @@ public class GameState {
 
     public ArrayList<Position> getPiecePositions(Color color){
         ArrayList<Position> piecePositions = new ArrayList<>();
+
         for (int row = 0; row < boardSize; row++) {
             for (int col = 0; col < boardSize; col++) {
-                if (board[row][col] == null) {
+                if (board[row][col] == null || board[row][col].getColor() != color) {
                     continue;
                 }
-                if (board[row][col].getColor() == color){
-                    piecePositions.add(new Position(row,col));
-                }
+                piecePositions.add(new Position(row, col));
             }
         }
+
         return piecePositions;
     }
 
@@ -92,6 +93,7 @@ public class GameState {
         return currentPlayer;
     }
 
+    //Used in GameControllers updateBoard method to avoid creating a new position object every iteration
     public Piece getPiece(int row, int col){
         return board[row][col];
     }
@@ -189,12 +191,17 @@ public class GameState {
     }
 
     public boolean playerHasMoves(){
-        return !getPossibleMoves(currentPlayer).isEmpty();
+        return !pieceCrowned && !getPossibleMoves(currentPlayer).isEmpty();
     }
 
     public void endTurn(){
         lastMove = null;
+        pieceCrowned = false;
         currentPlayer = currentPlayer.getOpponent();
+    }
+
+    public void setPieceCrowned(boolean pieceCrowned) {
+        this.pieceCrowned = pieceCrowned;
     }
 
     public boolean isGameOver(){
@@ -339,6 +346,8 @@ public class GameState {
         this.board[1][4] = null;
         this.board[1][0] = null;
     }
+
+
 //
 //    public void printBoard(){
 //        String[][] boardStrArr = new String[8][8];

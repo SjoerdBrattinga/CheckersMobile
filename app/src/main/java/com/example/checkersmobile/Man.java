@@ -25,7 +25,7 @@ public class Man extends Piece{
     }
 
     private void makeKing(GameState gameState){
-        //TODO: end turn
         gameState.setPiece(new King(getPosition(),getColor()), getPosition());
+        gameState.setPieceCrowned(true);
     }
 }
