@@ -39,7 +39,7 @@ public abstract class Piece {
         return move.isDiagonal()
                 && ( move.distance() == 1 //regular move
                 || ( move.distance() == 2 //jump
-                && gameState.getPiece(move.getInBetween()) != null
+                && !gameState.isEmptyTile(move.getInBetween())
                 && gameState.getPiece(move.getInBetween()).getColor() == this.getColor().getOpponent()));
     }
 }

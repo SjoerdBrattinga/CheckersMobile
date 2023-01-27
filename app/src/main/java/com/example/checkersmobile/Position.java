@@ -35,6 +35,11 @@ public class Position {
         return col;
     }
 
+    /**
+     * Gets the 4 diagonal positions for a given distance
+     * @param distance use 1 for adjacent positions and a 2 for jump positions
+     * @return 4 diagonal positions for a given distance
+     */
     public Position[] getDiagonal(int distance){
         return new Position[]{
                 getUpLeft(distance),
@@ -51,10 +56,7 @@ public class Position {
 
         Position position = (Position) o;
 
-        if (row != position.row) return false;
-        if (col != position.col) return false;
-
-        return true;
+        return row == position.row && col == position.col;
     }
 
     @NonNull

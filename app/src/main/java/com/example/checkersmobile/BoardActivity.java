@@ -17,6 +17,8 @@ import java.util.ArrayList;
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener{
     private TextView gameInfoTxt;
     private ImageButton[][] btnBoard;
+
+    private Player lightPlayer, darkPlayer;
     private ArrayList<Position> highlightedTiles;
     private Position highLightedPiece;
     private GameController controller;
@@ -27,7 +29,11 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_board);
 
         highlightedTiles = new ArrayList<>();
-        controller = new GameController(new GameState(), this);
+
+        lightPlayer = new Player(Color.LIGHT, "Sjoerd");
+        darkPlayer = new Player(Color.DARK, "Player2");
+
+        controller = new GameController(new GameState(lightPlayer, darkPlayer), this);
         resizeBoard();
     }
 
@@ -69,7 +75,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public void resetTileHighlights(){
-        if(highlightedTiles.size() > 0){
+        if(!highlightedTiles.isEmpty()){
             highlightTiles(highlightedTiles, TileResource.DARK);
             highlightedTiles.clear();
         }
@@ -139,7 +145,8 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         }
 
         int width = size.x;
-        int height = width;
+        @SuppressWarnings("SuspiciousNameCombination")
+        int height = size.x;
 
         LinearLayout layout = findViewById(R.id.board);
         ViewGroup.LayoutParams params = layout.getLayoutParams();

@@ -2,36 +2,31 @@ package com.example.checkersmobile;
 
 import java.util.ArrayList;
 
-
 public class GameState {
-    private final String TAG = "GameState";
     private final int boardSize = 8;
-    private final int startingRows = 3;
+    private Player lightPlayer, darkPlayer;
     private Color currentPlayer = Color.LIGHT;
-    private final Piece[][] board;
+    private Piece[][] board;
     private Move lastMove;
     private boolean pieceCrowned;
 
-    public GameState(){
+    public GameState(Player lightPlayer, Player darkPlayer){
+        this.lightPlayer = lightPlayer;
+        this.darkPlayer = darkPlayer;
+
+        initBoard();
+    }
+
+    private void initBoard(){
         board = new Piece[boardSize][boardSize];
-        initBoard(board);
-        //initTestBoard();
-    }
+        int startingRows = 3;
 
-    private void initTestBoard(){
-        board[3][4] = new King(new Position(3,4), Color.DARK);
-        board[3][6] = new King(new Position(3,6), Color.DARK);
-        board[5][4] = new King(new Position(5,4), Color.LIGHT);
-        board[5][6] = new King(new Position(5,6), Color.LIGHT);
-    }
-
-    private void initBoard(Piece[][] board){
         for (int row = 0; row < boardSize; row++){
             for (int col = 0; col < boardSize; col++){
                 if((row + col) % 2 == 1) {
                     if (row < startingRows){
                         board[row][col] = new Man(new Position(row,col), Color.DARK);
-                    } else if (row >= boardSize - startingRows ){
+                    } else if (row >= boardSize - startingRows){
                         board[row][col] = new Man(new Position(row,col), Color.LIGHT);
                     }
                 }
@@ -40,7 +35,7 @@ public class GameState {
         testBoard();
     }
 
-    public ArrayList<Position> getPiecePositions(Color color){
+    private ArrayList<Position> getPiecePositions(Color color){
         ArrayList<Position> piecePositions = new ArrayList<>();
 
         for (int row = 0; row < boardSize; row++) {
@@ -60,7 +55,8 @@ public class GameState {
     }
 
     public void movePiece(Move move){
-        getPiece(move.getCurrent()).move(this, move);
+        Piece piece = getPiece(move.getCurrent());
+        piece.move(this, move);
         lastMove = move;
     }
 
@@ -69,7 +65,7 @@ public class GameState {
 
         return piece.getColor() == getCurrentPlayer()
                 && isMoveWithinBoardBounds(move)
-                && getPiece(move.getDestination()) == null
+                && isEmptyTile(move.getDestination())
                 && piece.isMoveLegal(this, move);
     }
 
@@ -110,12 +106,12 @@ public class GameState {
         return boardSize;
     }
 
-    public ArrayList<Move> getPossibleMoves(Color player) {
+    public ArrayList<Move> getAllPossibleMoves() {
 
         ArrayList<Move> possibleMoves = new ArrayList<>();
 
         if (lastMove == null) {
-            ArrayList<Position> piecePositions = getPiecePositions(player);
+            ArrayList<Position> piecePositions = getPiecePositions(currentPlayer);
 
             for (Position position : piecePositions) {
                 possibleMoves.addAll(getPossibleJumps(position));
@@ -123,7 +119,7 @@ public class GameState {
 
             if(possibleMoves.isEmpty()){
                 for (Position position : piecePositions) {
-                    possibleMoves.addAll(getPossibleMoves(position));
+                    possibleMoves.addAll(getAllPossibleMoves(position));
                 }
             }
 
@@ -134,7 +130,7 @@ public class GameState {
         return possibleMoves;
     }
 
-    public ArrayList<Move> getPossibleJumps(Position piecePosition) {
+    private ArrayList<Move> getPossibleJumps(Position piecePosition) {
         ArrayList<Move> possibleMoves = new ArrayList<>();
 
         if(canJump(piecePosition)){
@@ -152,7 +148,7 @@ public class GameState {
         return possibleMoves;
     }
 
-    public ArrayList<Move> getPossibleMoves(Position piecePosition) {
+    public ArrayList<Move> getAllPossibleMoves(Position piecePosition) {
         ArrayList<Move> possibleMoves = new ArrayList<>();
         Position[] destinations;
 
@@ -173,16 +169,13 @@ public class GameState {
         return possibleMoves;
     }
 
-    public boolean canJump(Position position){
+    private boolean canJump(Position position){
         Position[] destinations = position.getDiagonal(2);
 
         for (Position destination : destinations) {
             Move move = new Move(position, destination);
 
-            if (isMoveLegal(move)
-                    && move.isJump()
-                    && (getPiece(move.getInBetween()) != null)
-                    && (getPiece(move.getInBetween()).getColor() != currentPlayer)) {
+            if (isMoveLegal(move)){
                 return true;
             }
         }
@@ -191,7 +184,7 @@ public class GameState {
     }
 
     public boolean playerHasMoves(){
-        return !pieceCrowned && !getPossibleMoves(currentPlayer).isEmpty();
+        return !pieceCrowned && !getAllPossibleMoves().isEmpty();
     }
 
     public void endTurn(){
@@ -205,13 +198,51 @@ public class GameState {
     }
 
     public boolean isGameOver(){
-        ArrayList<Position> opponentPieces = getPiecePositions(currentPlayer);
+        //
+        ArrayList<Position> pieces = getPiecePositions(currentPlayer);
 
-        return opponentPieces.isEmpty() || getPossibleMoves(currentPlayer).isEmpty();
+        return pieces.isEmpty() || getAllPossibleMoves().isEmpty();
     }
 
+
+
     //test functions
-    //    public ArrayList<Move> getPossibleMoves2(){
+
+    private void initTestBoard(){
+        board[3][4] = new King(new Position(3,4), Color.DARK);
+        board[3][6] = new King(new Position(3,6), Color.DARK);
+        board[5][4] = new King(new Position(5,4), Color.LIGHT);
+        board[5][6] = new King(new Position(5,6), Color.LIGHT);
+    }
+
+    private void testBoard(){
+        this.board[0][3] = null;
+        this.board[0][5] = null;
+        this.board[0][7] = null;
+        this.board[1][0] = null;
+        this.board[1][4] = new Man(new Position(1,4), Color.DARK);
+        this.board[2][1] = null;
+        this.board[2][5] = null;
+        this.board[3][2] = new Man(new Position(3,2), Color.DARK);
+        this.board[3][4] = new Man(new Position(3,4), Color.DARK);
+        this.board[4][1] = null;
+        this.board[5][2] = new Man(new Position(5,2), Color.DARK);
+    }
+
+    private void testBoard2(){
+        this.board[0][3] = null;
+        this.board[1][0] = null;
+        this.board[1][4] = null;
+        this.board[2][1] = null;
+        this.board[2][5] = null;
+        this.board[3][2] = new Man(new Position(3,2), Color.DARK);
+        this.board[3][4] = new Man(new Position(3,4), Color.DARK);
+        this.board[4][1] = null;
+        this.board[5][2] = new Man(new Position(5,2), Color.DARK);
+    }
+}
+
+//    public ArrayList<Move> getPossibleMoves2(){
 //        Log.d(TAG, "getPossibleMoves2: ");
 //        //ArrayList<Position> playerPiecePositions = getPiecePositions(turn);
 //        ArrayList<Piece> playerPieces = getPieces(currentPlayer);
@@ -320,32 +351,7 @@ public class GameState {
 //        return possibleMoves;
 //    }
 //
-    public void testBoard(){
-        this.board[4][1] = null;
-        this.board[2][5] = null;
-        this.board[2][1] = null;
-        this.board[0][3] = null;
-        this.board[0][5] = null;
-        this.board[1][4] = new Man(new Position(1,4), Color.DARK);
-        this.board[0][7] = null;
-        this.board[3][2] = new Man(new Position(3,2), Color.DARK);
-        this.board[3][4] = new Man(new Position(3,4), Color.DARK);
-        this.board[5][2] = new Man(new Position(5,2), Color.DARK);
-        //this.board[1][4] = null;
-        this.board[1][0] = null;
-    }
-//
-    public void testBoard2(){
-        this.board[4][1] = null;
-        this.board[2][5] = null;
-        this.board[2][1] = null;
-        this.board[0][3] = null;
-        this.board[3][2] = new Man(new Position(3,2), Color.DARK);
-        this.board[3][4] = new Man(new Position(3,4), Color.DARK);
-        this.board[5][2] = new Man(new Position(5,2), Color.DARK);
-        this.board[1][4] = null;
-        this.board[1][0] = null;
-    }
+
 
 
 //
@@ -397,4 +403,4 @@ public class GameState {
 //
 //        return false;
 //    }
-}
+

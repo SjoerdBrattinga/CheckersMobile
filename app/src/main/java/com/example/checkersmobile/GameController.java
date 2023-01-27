@@ -4,8 +4,9 @@ import java.util.ArrayList;
 
 public class GameController {
     private final String TAG = "GameController";
-    private GameState gameState;
-    private BoardActivity activity;
+    private final GameState gameState;
+    private final BoardActivity activity;
+    private Player player1, player2, currentPlayer;
     private Piece selectedPiece;
     private ArrayList<Move> possibleMoves;
 
@@ -48,11 +49,11 @@ public class GameController {
         activity.setCurrentPlayerText(gameState.getCurrentPlayer().toString());
 
         updateBoard();
-        getPossibleMoves();
+        showPossibleMoves();
     }
 
-    private void getPossibleMoves(){
-        possibleMoves = gameState.getPossibleMoves(gameState.getCurrentPlayer());
+    private void showPossibleMoves(){
+        possibleMoves = gameState.getAllPossibleMoves();
         activity.highlightTiles(getMovePiecePositions(possibleMoves), TileResource.GREEN);
     }
 
@@ -64,7 +65,7 @@ public class GameController {
             updateBoard();
 
             if (gameState.playerHasMoves()) {
-                getPossibleMoves();
+                showPossibleMoves();
                 changeSelectedPiece(move.getDestination());
             } else {
                 endTurn();
@@ -81,7 +82,7 @@ public class GameController {
             //TODO: game over pop-up
         } else {
             activity.setCurrentPlayerText(gameState.getCurrentPlayer().toString());
-            getPossibleMoves();
+            showPossibleMoves();
         }
     }
 
@@ -119,7 +120,7 @@ public class GameController {
     private void undoPieceSelection() {
         selectedPiece = null;
         activity.resetTileHighlights();
-        getPossibleMoves();
+        showPossibleMoves();
     }
 
     private void changeSelectedPiece(Position selected) {
@@ -130,7 +131,7 @@ public class GameController {
     private void highLightPossibleMovesForSelected(Position piecePosition){
         activity.resetTileHighlights();
 
-        ArrayList<Move> possibleMoves = gameState.getPossibleMoves(piecePosition);
+        ArrayList<Move> possibleMoves = gameState.getAllPossibleMoves(piecePosition);
 
         if (!possibleMoves.isEmpty()) {
             activity.highLightTile(piecePosition, TileResource.BLUE);
