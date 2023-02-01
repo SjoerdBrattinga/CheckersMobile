@@ -1,7 +1,9 @@
 package com.example.checkersmobile;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.view.Display;
@@ -30,13 +32,13 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 
         highlightedTiles = new ArrayList<>();
 
-        lightPlayer = new Player(Color.LIGHT, "Sjoerd");
-        darkPlayer = new Player(Color.DARK, "Player2");
-
         controller = new GameController(new GameState(lightPlayer, darkPlayer), this);
         resizeBoard();
     }
 
+    /*
+     * Sends the selected position to the GameController
+     */
     @Override
     public void onClick(View view) {
         String tag = (String) view.getTag();
@@ -47,6 +49,9 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         controller.handleInput(new Position(row,col));
     }
 
+    /*
+     * Draw the checkerboard tiles
+     */
     public void drawBoard(int rows, int columns){
         btnBoard = new ImageButton[rows][columns];
 
@@ -152,5 +157,32 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         ViewGroup.LayoutParams params = layout.getLayoutParams();
         params.width = width;
         params.height = height;
+    }
+
+    /*
+     * The dialog menu that pops up after a game has ended
+     */
+    public void gameOverDialog() {
+
+        final CharSequence choices[] = new CharSequence[]{"Play Again", "Return to Main Menu"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(BoardActivity.this);
+        builder.setCancelable(false);
+        builder.setTitle( " Wins!");
+        builder.setItems(choices, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int clickValue) {
+
+                // If user clicks New Match, create a new match
+                if (clickValue == 0) {
+                    //restartMatch();
+                }
+                // If user chooses to Return to Main Menu
+                else if (clickValue == 1) {
+                    //quitMatch();
+                }
+            }
+        });
+        builder.show();
     }
 }

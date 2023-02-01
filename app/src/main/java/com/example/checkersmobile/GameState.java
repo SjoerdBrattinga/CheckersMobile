@@ -17,6 +17,9 @@ public class GameState {
         initBoard();
     }
 
+    /*
+     * Place the pieces at their starting positions
+     */
     private void initBoard(){
         board = new Piece[boardSize][boardSize];
         int startingRows = 3;
@@ -32,7 +35,7 @@ public class GameState {
                 }
             }
         }
-        testBoard();
+        //testBoard();
     }
 
     private ArrayList<Position> getPiecePositions(Color color){
@@ -54,6 +57,9 @@ public class GameState {
         board[position.getRow()][position.getCol()] = piece;
     }
 
+    /*
+     * Only use this after checking if move is legal
+     */
     public void movePiece(Move move){
         Piece piece = getPiece(move.getCurrent());
         piece.move(this, move);
@@ -145,6 +151,7 @@ public class GameState {
                 }
             }
         }
+
         return possibleMoves;
     }
 
@@ -187,18 +194,17 @@ public class GameState {
         return !pieceCrowned && !getAllPossibleMoves().isEmpty();
     }
 
+    public void setPieceCrowned(boolean pieceCrowned) {
+        this.pieceCrowned = pieceCrowned;
+    }
+
     public void endTurn(){
         lastMove = null;
         pieceCrowned = false;
         currentPlayer = currentPlayer.getOpponent();
     }
 
-    public void setPieceCrowned(boolean pieceCrowned) {
-        this.pieceCrowned = pieceCrowned;
-    }
-
     public boolean isGameOver(){
-        //
         ArrayList<Position> pieces = getPiecePositions(currentPlayer);
 
         return pieces.isEmpty() || getAllPossibleMoves().isEmpty();

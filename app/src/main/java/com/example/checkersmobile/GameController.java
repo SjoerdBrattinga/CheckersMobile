@@ -79,13 +79,16 @@ public class GameController {
 
         if (gameState.isGameOver()){
             activity.setPlayerWinsText(gameState.getCurrentPlayer().getOpponent());
-            //TODO: game over pop-up
+            activity.gameOverDialog();
         } else {
             activity.setCurrentPlayerText(gameState.getCurrentPlayer().toString());
             showPossibleMoves();
         }
     }
 
+    /*
+     * Draw the pieces according to the current game state
+     */
     private void updateBoard() {
         for (int row = 0; row < gameState.getBoardSize(); row++) {
             for (int col = 0; col < gameState.getBoardSize(); col++) {

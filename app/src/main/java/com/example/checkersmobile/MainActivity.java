@@ -15,14 +15,30 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button playBtn = findViewById(R.id.playBtn);
-        playBtn.setOnClickListener(view -> openBoardActivity());
+        Button playBtn = findViewById(R.id.startBtn);
+        Button highScoreBtn = findViewById(R.id.highScoreBtn);
+        playBtn.setOnClickListener(view -> openSettingsActivity());
+        highScoreBtn.setOnClickListener(view -> openHighScoreActivity());
     }
 
     private void openBoardActivity() {
         Log.d(TAG, "OpenBoardActivity");
 
         Intent intent = new Intent(this, BoardActivity.class);
+        startActivity(intent);
+    }
+
+    private void openHighScoreActivity() {
+        Log.d(TAG, "OpenHighScoreActivity");
+
+        Intent intent = new Intent(this, HighScoreActivity.class);
+        startActivity(intent);
+    }
+
+    private void openSettingsActivity() {
+        Log.d(TAG, "OpenSettingsActivity");
+
+        Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
     }
 }

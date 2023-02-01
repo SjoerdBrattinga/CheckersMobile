@@ -9,18 +9,6 @@ public abstract class Piece {
         this.color = color;
     }
 
-    private void setPosition(Position position){
-        this.position = position;
-    }
-
-    public Color getColor(){
-        return color;
-    }
-
-    public Position getPosition() {
-        return position;
-    }
-
     public void move(GameState gameState, Move move){
         //Remove piece at current position
         gameState.setPiece(null, position);
@@ -41,5 +29,17 @@ public abstract class Piece {
                 || ( move.distance() == 2 //jump
                 && !gameState.isEmptyTile(move.getInBetween())
                 && gameState.getPiece(move.getInBetween()).getColor() == this.getColor().getOpponent()));
+    }
+
+    private void setPosition(Position position){
+        this.position = position;
+    }
+
+    public Color getColor(){
+        return color;
+    }
+
+    public Position getPosition() {
+        return position;
     }
 }

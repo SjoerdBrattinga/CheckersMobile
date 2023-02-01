@@ -5,4 +5,9 @@
     <string name="highScoreBtnTxt">High Scores</string>
     <string name="playBtnTxt">Play</string>
     <string name="checkersTxt">Checkers</string>
+    <string name="light_player">Light Player</string>
+    <string name="dark_player">Dark Player</string>
+    <string name="add">Add</string>
+    <string name="start">Start</string>
+    <string name="high_scores">High Scores</string>
 </resources>
