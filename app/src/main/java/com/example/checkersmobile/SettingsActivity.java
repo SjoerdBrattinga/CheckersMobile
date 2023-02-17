@@ -44,10 +44,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         Spinner darkPlayerSpinner = findViewById(R.id.darkPlayerSpinner);
 
         players = getPlayers();
-        //create an adapter to describe how the items are displayed, adapters are used in several places in android.
-        //There are multiple variations of this, but this is the basic variant.
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, players);
-        //set the spinners adapter to the previously created one.
 
         lightPlayerSpinner.setAdapter(adapter);
         darkPlayerSpinner.setAdapter(adapter);

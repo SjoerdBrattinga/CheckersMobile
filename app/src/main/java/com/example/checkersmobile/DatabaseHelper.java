@@ -10,7 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private Context context;
+    private final Context context;
     private static final String DATABASE_NAME = "CheckersMobile.db";
     private static final int DATABASE_VERSION = 1;
 
@@ -70,12 +70,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getHighScores(){
         String query = String.format("SELECT * FROM %s ORDER BY %s LIMIT 10", TABLE_NAME, COLUMN_WINS);
         SQLiteDatabase db = getReadableDatabase();
-//        SELECT
-//                column_list
-//        FROM
-//                table
-//        ORDER BY column_1
-//        LIMIT row_count;
+
         Cursor cursor = null;
 
         if(db != null){

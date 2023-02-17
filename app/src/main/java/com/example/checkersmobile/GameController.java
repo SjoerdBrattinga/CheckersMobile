@@ -6,7 +6,6 @@ public class GameController {
     private final String TAG = "GameController";
     private final GameState gameState;
     private final BoardActivity activity;
-    private Player player1, player2, currentPlayer;
     private Piece selectedPiece;
     private ArrayList<Move> possibleMoves;
 
@@ -80,15 +79,14 @@ public class GameController {
         if (gameState.isGameOver()){
             activity.setPlayerWinsText(gameState.getCurrentPlayer().getOpponent());
             activity.gameOverDialog();
+
+            //TODO: Add win to local db
         } else {
             activity.setCurrentPlayerText(gameState.getCurrentPlayer().toString());
             showPossibleMoves();
         }
     }
 
-    /*
-     * Draw the pieces according to the current game state
-     */
     private void updateBoard() {
         for (int row = 0; row < gameState.getBoardSize(); row++) {
             for (int col = 0; col < gameState.getBoardSize(); col++) {
