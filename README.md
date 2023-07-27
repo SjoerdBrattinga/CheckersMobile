@@ -1,1 +1,3 @@
 # CheckersMobile
+
+Checkers for Android
